@@ -1,0 +1,172 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Main.gd" type="Script" id=1]
+
+[node name="Control" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -0.890991
+margin_right = -0.890991
+margin_bottom = 30.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -23.9999
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="PathContainer" type="HBoxContainer" parent="VBoxContainer"]
+margin_right = 1000.0
+margin_bottom = 20.0
+custom_constants/separation = 200
+alignment = 1
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Path" type="Label" parent="VBoxContainer/PathContainer"]
+margin_left = 281.0
+margin_top = 3.0
+margin_right = 416.0
+margin_bottom = 17.0
+text = "C:\\Downloads\\Videos"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ChangePath" type="Button" parent="VBoxContainer/PathContainer"]
+margin_left = 616.0
+margin_right = 718.0
+margin_bottom = 20.0
+text = "Change Folder"
+align = 2
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+margin_top = 24.0
+margin_right = 1000.0
+margin_bottom = 524.0
+rect_min_size = Vector2( 100, 500 )
+
+[node name="ContainerEntryList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
+
+[node name="ContainerActionButtons" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 528.0
+margin_right = 1000.0
+margin_bottom = 552.0
+custom_constants/separation = 70
+alignment = 1
+
+[node name="ContainerTitleEdit" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
+margin_left = 57.0
+margin_right = 393.0
+margin_bottom = 24.0
+
+[node name="LabelTitle" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerTitleEdit"]
+margin_top = 5.0
+margin_right = 32.0
+margin_bottom = 19.0
+text = "Title:"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="TextEditTitle" type="LineEdit" parent="VBoxContainer/ContainerActionButtons/ContainerTitleEdit"]
+margin_left = 36.0
+margin_right = 336.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 300, 0 )
+
+[node name="ContainerDateEdit" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
+margin_left = 463.0
+margin_right = 581.0
+margin_bottom = 24.0
+
+[node name="LabelDate" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerDateEdit"]
+margin_top = 5.0
+margin_right = 34.0
+margin_bottom = 19.0
+text = "Date:"
+
+[node name="TextEditDate" type="LineEdit" parent="VBoxContainer/ContainerActionButtons/ContainerDateEdit"]
+margin_left = 38.0
+margin_right = 118.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 80, 0 )
+
+[node name="ContainerEpcount" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
+margin_left = 651.0
+margin_right = 804.0
+margin_bottom = 24.0
+
+[node name="LabelEpcount" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerEpcount"]
+margin_top = 5.0
+margin_right = 91.0
+margin_bottom = 19.0
+text = "Episode Count"
+
+[node name="TextEditEpcount" type="LineEdit" parent="VBoxContainer/ContainerActionButtons/ContainerEpcount"]
+margin_left = 95.0
+margin_right = 153.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 30, 0 )
+
+[node name="ButtonAddEntry" type="Button" parent="VBoxContainer/ContainerActionButtons"]
+margin_left = 874.0
+margin_right = 943.0
+margin_bottom = 24.0
+text = "Add Title"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ContainerWatchScript" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 556.0
+margin_right = 1000.0
+margin_bottom = 580.0
+alignment = 1
+
+[node name="LabelWatchScript" type="Label" parent="VBoxContainer/ContainerWatchScript"]
+margin_left = 48.0
+margin_top = 5.0
+margin_right = 128.0
+margin_bottom = 19.0
+text = "Watch Script"
+
+[node name="LineEditWatchScript" type="LineEdit" parent="VBoxContainer/ContainerWatchScript"]
+margin_left = 132.0
+margin_right = 952.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 820, 0 )
+
+[node name="ContainerDownloadScript" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 584.0
+margin_right = 1000.0
+margin_bottom = 608.0
+alignment = 1
+
+[node name="LabelDownloadScript" type="Label" parent="VBoxContainer/ContainerDownloadScript"]
+margin_left = 46.0
+margin_top = 5.0
+margin_right = 149.0
+margin_bottom = 19.0
+text = "Download Script"
+
+[node name="LineEditDownloadScript" type="LineEdit" parent="VBoxContainer/ContainerDownloadScript"]
+margin_left = 153.0
+margin_right = 953.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 800, 0 )
+
+[node name="Background" type="Sprite" parent="."]
+[connection signal="pressed" from="VBoxContainer/PathContainer/ChangePath" to="." method="_on_ChangePath_pressed"]
+[connection signal="text_changed" from="VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle" to="." method="_on_TextEditTitle_text_changed"]
+[connection signal="pressed" from="VBoxContainer/ContainerActionButtons/ButtonAddEntry" to="." method="_on_ButtonAddEntry_pressed"]

@@ -1,0 +1,38 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://ContainerEntry.gd" type="Script" id=1]
+[ext_resource path="res://ButtonProgress.tscn" type="PackedScene" id=2]
+
+[node name="ContainerEntry" type="HBoxContainer"]
+margin_right = 1024.0
+margin_bottom = 20.0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="LabelTitle" type="LinkButton" parent="."]
+margin_right = 250.0
+margin_bottom = 20.0
+rect_min_size = Vector2( 250, 0 )
+text = "asd"
+
+[node name="ContainerProgress" type="HBoxContainer" parent="."]
+margin_left = 254.0
+margin_right = 254.0
+margin_bottom = 20.0
+
+[node name="Button" parent="ContainerProgress" instance=ExtResource( 2 )]
+visible = false
+
+[node name="ButtonRunScript" type="Button" parent="."]
+visible = false
+margin_left = 270.0
+margin_right = 282.0
+margin_bottom = 20.0
+
+[node name="ButtonChangeDate" type="Button" parent="."]
+visible = false
+margin_left = 270.0
+margin_right = 282.0
+margin_bottom = 20.0
