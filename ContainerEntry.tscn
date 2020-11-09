@@ -17,13 +17,24 @@ margin_bottom = 20.0
 rect_min_size = Vector2( 250, 0 )
 text = "asd"
 
-[node name="ContainerProgress" type="HBoxContainer" parent="."]
+[node name="ContainerSeasons" type="VBoxContainer" parent="."]
 margin_left = 254.0
-margin_right = 254.0
+margin_right = 854.0
 margin_bottom = 20.0
+rect_min_size = Vector2( 600, 0 )
 
-[node name="Button" parent="ContainerProgress" instance=ExtResource( 2 )]
+[node name="ContainerProgress" type="HBoxContainer" parent="ContainerSeasons"]
+margin_right = 600.0
+rect_min_size = Vector2( 600, 0 )
+
+[node name="Button" parent="ContainerSeasons/ContainerProgress" instance=ExtResource( 2 )]
 visible = false
+
+[node name="LabelTimeRemaining" type="Label" parent="."]
+margin_left = 858.0
+margin_top = 3.0
+margin_right = 858.0
+margin_bottom = 17.0
 
 [node name="ButtonRunScript" type="Button" parent="."]
 visible = false

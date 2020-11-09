@@ -25,7 +25,7 @@ Global="*res://global.gd"
 
 [display]
 
-window/size/height=630
+window/size/height=720
 
 [editor_plugins]
 
