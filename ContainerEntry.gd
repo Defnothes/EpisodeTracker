@@ -8,7 +8,14 @@ extends HBoxContainer
 var episodes = []
 var watched = []
 var date
+var quality
+var subber
+
 var parent = null
+
+var time_remaining_unix
+var last_watched
+var dl_script 
 
 var progress_containers = []
 
@@ -16,13 +23,19 @@ var progress_containers = []
 func _ready():
 	date = ''
 
-func set_properties(title, date, epcount, 
+func set_properties(title, date, epcount, last_watched,
+					quality, subber,
+					download_script,
 					callback_object):
 	$LabelTitle.text = title
 	self.date = date
 	self.watched = watched
+	self.quality = quality
+	self.subber = subber
+	self.last_watched = last_watched
+	dl_script = download_script
 	set_epcount(epcount)
-	$LabelTitle.connect("pressed", callback_object, 'fill_details', 
+	var _err = $LabelTitle.connect("pressed", callback_object, 'fill_details', 
 						[$LabelTitle.text, date, len(episodes)])
 	parent = callback_object
 	set_time_remaining()
@@ -54,15 +67,16 @@ func check_new_releases():
 		if ep.current_status == Global.status.UNRELEASED and \
 				Global.is_available_by_time(date, ep.index):
 			ep.set_status(Global.status.RELEASED, ep.index)
+			ep.set_download_callback(dl_script, $LabelTitle.text, quality, subber)
 
-func set_episode(ep, stat, watch_action, dl_action):
+func set_episode(ep, stat, watch_action):
 	ep = ep-1
 	if ep is int:
 		if ep >= len(episodes):
 			set_epcount(ep+1)
 		episodes[ep].set_status(stat, ep)
 		episodes[ep].set_watch_callback(watch_action)
-		episodes[ep].set_download_callback(dl_action)
+		#episodes[ep].set_download_callback(dl_action)
 	
 	
 func set_watched_episode(episode, already_watched):
@@ -70,7 +84,8 @@ func set_watched_episode(episode, already_watched):
 		watched.erase(episode)
 	else:
 		watched.append(episode)
-	parent.update_watched($LabelTitle.text, watched)
+		last_watched = Global.string_from_date_time(OS.get_datetime())
+	parent.update_watched($LabelTitle.text, watched, last_watched)
 
 func update_watched_list(watched_eps):
 	self.watched = watched_eps
@@ -87,5 +102,5 @@ func set_time_remaining():
 		if time_prev>=0 and time_remaining<0:
 				break
 			
-	
+	self.time_remaining_unix = time_remaining
 	$LabelTimeRemaining.set_text(Global.seconds_to_string(-time_remaining))

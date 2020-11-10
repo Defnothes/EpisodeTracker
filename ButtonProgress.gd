@@ -17,6 +17,8 @@ var watched_callback
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	set_status(Global.status.UNRELEASED, -1)
+	$HTTPRequest.connect("request_completed", self, "call_magnet")
+	
 
 func set_status(new_status, ep_number):
 	current_status = new_status
@@ -27,9 +29,9 @@ func set_watch_callback(action):
 	watch_script = action[0]
 	watch_params = action[1]
 	
-func set_download_callback(action):
-	dl_script = action[0]
-	dl_params = action[1]
+func set_download_callback(download_script, title, quality, subber):
+	dl_script = download_script
+	dl_params = Global.generate_api_request_URI(title, index, quality, subber)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -51,10 +53,21 @@ func _on_Button_pressed():
 		Global.status.DOWNLOADED:
 			set_status(Global.status.WATCHED, index)
 			watched_parent.call(watched_callback, index, true)
+			if not Input.is_key_pressed(KEY_CONTROL):
+				OS.execute(watch_script, watch_params, false)
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DOWNLOADED,index)
 				watched_parent.call(watched_callback, index, false)
-	if watch_script!=null and not Input.is_key_pressed(KEY_CONTROL):
-		#print(watch_script, ' : ', watch_params)
-		OS.execute(watch_script, watch_params, false)
+			else:
+				OS.execute(watch_script, watch_params, false)
+		Global.status.RELEASED:
+			if dl_script!=null:
+				print('API Req:' + dl_params)
+				$HTTPRequest.request(dl_params)
+				#print(dl_script, dl_params)
+
+func call_magnet(result, response_code, headers, body):
+	var magnet = Global.generate_magnet_from_JSON(body)
+	if magnet!=null:
+		OS.execute(dl_script, [magnet], false)
