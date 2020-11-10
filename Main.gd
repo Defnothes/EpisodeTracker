@@ -8,6 +8,7 @@ var regex_ep :RegEx
 enum sort_types {TITLE, PROGRESS, REMAINING, NONE}
 var sort_by = null
 var sort_dir = true
+var search_recursive = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -42,6 +43,8 @@ func _ready():
 	
 	sort_by = config.get_value('general', 'sort_by', sort_types.NONE)
 	sort_dir = config.get_value('general', 'sort_dir', true)
+	search_recursive = config.get_value('general', 'search_recursive', false)
+	$VBoxContainer/PathContainer/CheckBoxRecursive.set_pressed(search_recursive)
 	#$VBoxContainer/EntriesHeader/LabelProgress.rect_min_size =\
 	#	cont_ent.get_child(1).rect_min_size
 	refresh()
@@ -53,7 +56,7 @@ func refresh():
 	for i in range(0, $VBoxContainer/ScrollContainer/ContainerEntryList.get_child_count()):
 		$VBoxContainer/ScrollContainer/ContainerEntryList.get_child(i).queue_free()
 	
-	var files = Global.list_files_in_directory(folder_path)
+	var files = Global.list_files_in_directory(folder_path, search_recursive)
 	
 	var entry_lines = []
 	for entry in entry_list:
@@ -207,6 +210,7 @@ func save_all():
 	config.set_value("entries", "list", entry_list)
 	config.set_value('general', 'sort_by', sort_by)
 	config.set_value('general', 'sort_dir', sort_dir)
+	config.set_value('general', 'search_recursive', search_recursive)
 	config.save("user://settings.cfg")
 
 func _on_ChangePath_pressed():
@@ -317,3 +321,7 @@ func _on_LineEditWatchScript_focus_exited():
 
 func _on_LineEditDownloadScript_focus_exited():
 	refresh()
+
+
+func _on_CheckBox_toggled(button_pressed):
+	search_recursive = button_pressed

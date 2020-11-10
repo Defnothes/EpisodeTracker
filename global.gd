@@ -124,7 +124,7 @@ func seconds_to_string(time_seconds):
 		time += ' min'
 	return time
 
-func list_files_in_directory(path):
+func list_files_in_directory(path, recursive = false):
 	var file_list = []
 	var dir = Directory.new()
 	if dir.open(path) == OK:
@@ -133,6 +133,8 @@ func list_files_in_directory(path):
 		while (file_name != ""):
 			if not dir.current_is_dir():
 				file_list.append(file_name)
+			elif recursive and file_name != '.' and file_name!='..':
+				file_list += list_files_in_directory(path + '/' +file_name, true)
 			file_name = dir.get_next()
 	else:
 		print("An error occurred when trying to access the path.")
