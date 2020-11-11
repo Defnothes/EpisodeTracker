@@ -3,6 +3,7 @@ extends Button
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
+var parent
 
 var watch_script = null;
 var watch_params = null;
@@ -19,6 +20,8 @@ func _ready():
 	set_status(Global.status.UNRELEASED, -1)
 	$HTTPRequest.connect("request_completed", self, "call_magnet")
 	
+func set_message_parent(mp):
+	parent = mp
 
 func set_status(new_status, ep_number):
 	current_status = new_status
@@ -54,20 +57,26 @@ func _on_Button_pressed():
 			set_status(Global.status.WATCHED, index)
 			watched_parent.call(watched_callback, index, true)
 			if not Input.is_key_pressed(KEY_CONTROL):
+				parent.print_info('Opening File: ' + str(watch_params))
 				OS.execute(watch_script, watch_params, false)
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DOWNLOADED,index)
 				watched_parent.call(watched_callback, index, false)
 			else:
+				parent.print_info('Opening File: ' + str(watch_params))
 				OS.execute(watch_script, watch_params, false)
 		Global.status.RELEASED:
 			if dl_script!=null:
-				print('API Req:' + dl_params)
+				parent.print_info('Submitting API Req: ' + str(dl_params))
 				$HTTPRequest.request(dl_params)
 				#print(dl_script, dl_params)
 
 func call_magnet(result, response_code, headers, body):
 	var magnet = Global.generate_magnet_from_JSON(body)
 	if magnet!=null:
+		parent.print_info('Submitting Magent link: ' + str(magnet).substr(0,50) + '[...]')
 		OS.execute(dl_script, [magnet], false)
+	else:
+		parent.print_error('Could not get magnet link from API response: '+
+							body.get_string_from_utf8().substr(0,50) + '[...]')

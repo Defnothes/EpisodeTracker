@@ -7,8 +7,8 @@
 [node name="Control" type="Control"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -0.890991
-margin_right = -0.890991
+margin_left = 0.168457
+margin_right = 0.168457
 margin_bottom = 30.0
 script = ExtResource( 1 )
 __meta__ = {
@@ -20,28 +20,28 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-margin_left = -488.0
-margin_top = -362.0
-margin_right = 497.0
-margin_bottom = 340.0
+margin_left = -546.0
+margin_top = -390.0
+margin_right = 555.0
+margin_bottom = 377.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="PathContainer" type="HBoxContainer" parent="VBoxContainer"]
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 30.0
 rect_min_size = Vector2( 0, 30 )
-custom_constants/separation = 200
+custom_constants/separation = 100
 alignment = 1
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
 [node name="Path" type="Label" parent="VBoxContainer/PathContainer"]
-margin_left = 274.0
+margin_left = 287.0
 margin_top = 8.0
-margin_right = 409.0
+margin_right = 422.0
 margin_bottom = 22.0
 text = "C:\\Downloads\\Videos"
 __meta__ = {
@@ -49,8 +49,8 @@ __meta__ = {
 }
 
 [node name="ChangePath" type="Button" parent="VBoxContainer/PathContainer"]
-margin_left = 609.0
-margin_right = 711.0
+margin_left = 522.0
+margin_right = 624.0
 margin_bottom = 30.0
 text = "Change Folder"
 align = 2
@@ -58,14 +58,20 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="CheckBoxRecursive" type="CheckBox" parent="VBoxContainer/PathContainer"]
+margin_left = 724.0
+margin_right = 814.0
+margin_bottom = 30.0
+text = "Recursive"
+
 [node name="HSeparator" type="HSeparator" parent="VBoxContainer"]
 margin_top = 34.0
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 38.0
 
 [node name="EntriesHeader" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 42.0
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 56.0
 
 [node name="LabelTitle" type="LinkButton" parent="VBoxContainer/EntriesHeader"]
@@ -95,27 +101,51 @@ text = "Next Episode in"
 
 [node name="HSeparator4" type="HSeparator" parent="VBoxContainer"]
 margin_top = 60.0
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 64.0
 
 [node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
 margin_top = 68.0
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 568.0
 rect_min_size = Vector2( 100, 500 )
 
 [node name="ContainerEntryList" type="VBoxContainer" parent="VBoxContainer/ScrollContainer"]
 
-[node name="ContainerActionButtons" type="HBoxContainer" parent="VBoxContainer"]
+[node name="HBoxContainerFilter" type="HBoxContainer" parent="VBoxContainer"]
 margin_top = 572.0
-margin_right = 985.0
+margin_right = 1101.0
 margin_bottom = 596.0
+alignment = 1
+
+[node name="LabelFilter" type="Label" parent="VBoxContainer/HBoxContainerFilter"]
+margin_left = 406.0
+margin_top = 5.0
+margin_right = 491.0
+margin_bottom = 19.0
+text = "Filter Entries:"
+
+[node name="LineEditFilter" type="LineEdit" parent="VBoxContainer/HBoxContainerFilter"]
+margin_left = 495.0
+margin_right = 695.0
+margin_bottom = 24.0
+rect_min_size = Vector2( 200, 0 )
+
+[node name="HSeparator3" type="HSeparator" parent="VBoxContainer"]
+margin_top = 600.0
+margin_right = 1101.0
+margin_bottom = 604.0
+
+[node name="ContainerActionButtons" type="HBoxContainer" parent="VBoxContainer"]
+margin_top = 608.0
+margin_right = 1101.0
+margin_bottom = 632.0
 custom_constants/separation = 30
 alignment = 1
 
 [node name="ContainerTitleEdit" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
-margin_left = 74.0
-margin_right = 410.0
+margin_left = 132.0
+margin_right = 468.0
 margin_bottom = 24.0
 
 [node name="LabelTitle" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerTitleEdit"]
@@ -134,8 +164,8 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 300, 0 )
 
 [node name="ContainerDateEdit" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
-margin_left = 440.0
-margin_right = 628.0
+margin_left = 498.0
+margin_right = 686.0
 margin_bottom = 24.0
 
 [node name="LabelDate" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerDateEdit"]
@@ -151,8 +181,8 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 150, 0 )
 
 [node name="ContainerEpcount" type="HBoxContainer" parent="VBoxContainer/ContainerActionButtons"]
-margin_left = 658.0
-margin_right = 811.0
+margin_left = 716.0
+margin_right = 869.0
 margin_bottom = 24.0
 
 [node name="LabelEpcount" type="Label" parent="VBoxContainer/ContainerActionButtons/ContainerEpcount"]
@@ -168,8 +198,8 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 30, 0 )
 
 [node name="ButtonAddEntry" type="Button" parent="VBoxContainer/ContainerActionButtons"]
-margin_left = 841.0
-margin_right = 910.0
+margin_left = 899.0
+margin_right = 968.0
 margin_bottom = 24.0
 disabled = true
 text = "Add Title"
@@ -178,9 +208,9 @@ __meta__ = {
 }
 
 [node name="ContainerRSS" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 600.0
-margin_right = 985.0
-margin_bottom = 624.0
+margin_top = 636.0
+margin_right = 1101.0
+margin_bottom = 660.0
 custom_constants/separation = 10
 alignment = 1
 
@@ -200,29 +230,29 @@ margin_bottom = 24.0
 rect_min_size = Vector2( 300, 0 )
 
 [node name="LabelQuality" type="Label" parent="VBoxContainer/ContainerRSS"]
-margin_left = 328.0
+margin_left = 386.0
 margin_top = 5.0
-margin_right = 374.0
+margin_right = 432.0
 margin_bottom = 19.0
 text = "Quality"
 
 [node name="LineEditQuality" type="LineEdit" parent="VBoxContainer/ContainerRSS"]
-margin_left = 384.0
-margin_right = 442.0
+margin_left = 442.0
+margin_right = 500.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 50, 0 )
 text = "1080p"
 
 [node name="LabelSubber" type="Label" parent="VBoxContainer/ContainerRSS"]
-margin_left = 452.0
+margin_left = 510.0
 margin_top = 5.0
-margin_right = 496.0
+margin_right = 554.0
 margin_bottom = 19.0
 text = "Subber"
 
 [node name="LineEditSubber" type="LineEdit" parent="VBoxContainer/ContainerRSS"]
-margin_left = 506.0
-margin_right = 656.0
+margin_left = 564.0
+margin_right = 714.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 150, 0 )
 text = "SubsPlease"
@@ -235,47 +265,57 @@ margin_bottom = 24.0
 text = "Update File"
 
 [node name="HSeparator2" type="HSeparator" parent="VBoxContainer"]
-margin_top = 628.0
-margin_right = 985.0
-margin_bottom = 632.0
+margin_top = 664.0
+margin_right = 1101.0
+margin_bottom = 668.0
 
 [node name="ContainerWatchScript" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 636.0
-margin_right = 985.0
-margin_bottom = 660.0
+margin_top = 672.0
+margin_right = 1101.0
+margin_bottom = 696.0
 alignment = 1
 
 [node name="LabelWatchScript" type="Label" parent="VBoxContainer/ContainerWatchScript"]
-margin_left = 40.0
+margin_left = 98.0
 margin_top = 5.0
-margin_right = 120.0
+margin_right = 178.0
 margin_bottom = 19.0
 text = "Watch Script"
 
 [node name="LineEditWatchScript" type="LineEdit" parent="VBoxContainer/ContainerWatchScript"]
-margin_left = 124.0
-margin_right = 944.0
+margin_left = 182.0
+margin_right = 1002.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 820, 0 )
 
 [node name="ContainerDownloadScript" type="HBoxContainer" parent="VBoxContainer"]
-margin_top = 664.0
-margin_right = 985.0
-margin_bottom = 688.0
+margin_top = 700.0
+margin_right = 1101.0
+margin_bottom = 724.0
 alignment = 1
 
 [node name="LabelDownloadScript" type="Label" parent="VBoxContainer/ContainerDownloadScript"]
-margin_left = 39.0
+margin_left = 97.0
 margin_top = 5.0
-margin_right = 142.0
+margin_right = 200.0
 margin_bottom = 19.0
 text = "Download Script"
 
 [node name="LineEditDownloadScript" type="LineEdit" parent="VBoxContainer/ContainerDownloadScript"]
-margin_left = 146.0
-margin_right = 946.0
+margin_left = 204.0
+margin_right = 1004.0
 margin_bottom = 24.0
 rect_min_size = Vector2( 800, 0 )
+
+[node name="LabelMessage" type="Label" parent="VBoxContainer"]
+margin_top = 728.0
+margin_right = 1101.0
+margin_bottom = 768.0
+rect_min_size = Vector2( 0, 40 )
+mouse_filter = 1
+text = "Greetings!"
+align = 1
+valign = 1
 
 [node name="Background" type="Sprite" parent="."]
 
@@ -286,13 +326,15 @@ script = ExtResource( 3 )
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 [connection signal="pressed" from="VBoxContainer/PathContainer/ChangePath" to="." method="_on_ChangePath_pressed"]
+[connection signal="toggled" from="VBoxContainer/PathContainer/CheckBoxRecursive" to="." method="_on_CheckBox_toggled"]
 [connection signal="pressed" from="VBoxContainer/EntriesHeader/LabelTitle" to="." method="_on_LabelTitle_pressed"]
 [connection signal="pressed" from="VBoxContainer/EntriesHeader/LabelProgress" to="." method="_on_LabelProgress_pressed"]
 [connection signal="pressed" from="VBoxContainer/EntriesHeader/LabelTimeRemaining" to="." method="_on_LabelTimeRemaining_pressed"]
+[connection signal="text_changed" from="VBoxContainer/HBoxContainerFilter/LineEditFilter" to="." method="_on_LineEdit_text_changed"]
 [connection signal="text_changed" from="VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle" to="." method="_on_TextEditTitle_text_changed"]
 [connection signal="text_changed" from="VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate" to="." method="_on_TextEditDate_text_changed"]
 [connection signal="text_changed" from="VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount" to="." method="_on_TextEditEpcount_text_changed"]
 [connection signal="pressed" from="VBoxContainer/ContainerActionButtons/ButtonAddEntry" to="." method="_on_ButtonAddEntry_pressed"]
-[connection signal="pressed" from="VBoxContainer/ContainerRSS/ButtonUpdateRSS" to="." method="_on_ButtonUpdateRSS_pressed"]
 [connection signal="focus_exited" from="VBoxContainer/ContainerWatchScript/LineEditWatchScript" to="." method="_on_LineEditWatchScript_focus_exited"]
 [connection signal="focus_exited" from="VBoxContainer/ContainerDownloadScript/LineEditDownloadScript" to="." method="_on_LineEditDownloadScript_focus_exited"]
+[connection signal="mouse_entered" from="VBoxContainer/LabelMessage" to="." method="_on_LabelMessage_mouse_entered"]

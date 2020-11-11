@@ -27,6 +27,7 @@ func set_properties(title, date, epcount, last_watched,
 					quality, subber,
 					download_script,
 					callback_object):
+	parent = callback_object
 	$LabelTitle.text = title
 	self.date = date
 	self.watched = watched
@@ -34,17 +35,17 @@ func set_properties(title, date, epcount, last_watched,
 	self.subber = subber
 	self.last_watched = last_watched
 	dl_script = download_script
-	set_epcount(epcount)
+	_set_epcount(epcount)
 	var _err = $LabelTitle.connect("pressed", callback_object, 'fill_details', 
 						[$LabelTitle.text, date, len(episodes)])
-	parent = callback_object
 	set_time_remaining()
 	
-func set_epcount(new_epcount):
+func _set_epcount(new_epcount):
 	for i in range(len(episodes),new_epcount):
 		var status_button = preload("res://ButtonProgress.tscn").instance()
 		get_progress_container(i, new_epcount).add_child(status_button)
 		status_button.index = i
+		status_button.set_message_parent(parent)
 		status_button.set_watched_callback(self, 'set_watched_episode')
 		episodes.append(status_button)
 		check_new_releases()
@@ -55,7 +56,17 @@ func set_epcount(new_epcount):
 	#	remove
 
 func get_progress_container(index, limit):
-	var container_index = 0 if limit<16 else index / 12
+	#var container_index = 0 if limit<16 else index / 12
+	var container_index
+	if limit<=16:
+		container_index = 0
+	elif limit>=25 and limit<=28 and index>=24:
+		container_index = 1
+	elif limit>=48 and limit<=52 and index>=47:
+		container_index = 3
+	else:
+		container_index = index / 12
+		
 	while container_index >= len(progress_containers):
 		var hcontainer = HBoxContainer.new()
 		$ContainerSeasons.add_child(hcontainer)
@@ -73,7 +84,7 @@ func set_episode(ep, stat, watch_action):
 	ep = ep-1
 	if ep is int:
 		if ep >= len(episodes):
-			set_epcount(ep+1)
+			_set_epcount(ep+1)
 		episodes[ep].set_status(stat, ep)
 		episodes[ep].set_watch_callback(watch_action)
 		#episodes[ep].set_download_callback(dl_action)

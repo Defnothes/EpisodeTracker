@@ -10,6 +10,11 @@ var sort_by = null
 var sort_dir = true
 var search_recursive = false
 
+var message_fade_counter = 0
+var message_fade_level = 0
+var message_color = Color(1,1,1,0)
+
+var files = []
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	regex_ep = Global.default_epnr_regex
@@ -38,8 +43,8 @@ func _ready():
 		config.get_value("download", 'subber',''))
 	
 	var cont_ent = preload("res://ContainerEntry.tscn").instance()
-	$VBoxContainer/EntriesHeader/LabelTitle.rect_min_size =\
-		 cont_ent.get_child(0).rect_min_size
+	#$VBoxContainer/EntriesHeader/LabelTitle.rect_min_size =\
+	#	 cont_ent.get_child(0).rect_min_size
 	
 	sort_by = config.get_value('general', 'sort_by', sort_types.NONE)
 	sort_dir = config.get_value('general', 'sort_dir', true)
@@ -50,16 +55,41 @@ func _ready():
 	refresh()
 	
 
+func print_info(message):
+	message_color = Color(1,1,1,1)
+	_message_set_text(message)
 	
-func refresh():
+func print_error(message):
+	message_color = Color(1,0,0,1)
+	_message_set_text(message)
+	
+func print_log(message):
+	pass
+
+func _message_set_text(message):
+	print(message)
+	message_fade_level = 0
+	message_fade_counter = 0
+	$VBoxContainer/LabelMessage.set_text(message)
+
+func passes_filter(title):
+	if $VBoxContainer/HBoxContainerFilter/LineEditFilter.text == '' or \
+		$VBoxContainer/HBoxContainerFilter/LineEditFilter.text in title:
+		return true
+	return false
+	
+func refresh(reload_files = true):
 	# Etry list
 	for i in range(0, $VBoxContainer/ScrollContainer/ContainerEntryList.get_child_count()):
 		$VBoxContainer/ScrollContainer/ContainerEntryList.get_child(i).queue_free()
 	
-	var files = Global.list_files_in_directory(folder_path, search_recursive)
+	if reload_files:
+		files = Global.list_files_in_directory(folder_path, search_recursive)
 	
 	var entry_lines = []
 	for entry in entry_list:
+		if not passes_filter(entry['title']):
+			continue
 		var entry_line = load("res://ContainerEntry.tscn").instance()
 		#entry_lines.append(entryLine)
 		$VBoxContainer/ScrollContainer/ContainerEntryList.add_child(entry_line)
@@ -70,12 +100,12 @@ func refresh():
 			self)
 		
 		for file in files:
-			if entry['title'].to_upper() in file.to_upper():
-				var ep_nr = get_episode_nr_from_filename(file)
+			if entry['title'].to_upper() in file[0].to_upper():
+				var ep_nr = get_episode_nr_from_filename(file[0])
 				if ep_nr == -1:
-					print('Something unexpected went wrong with the regex')
+					print_error('Something unexpected went wrong with the regex')
 				else:
-					var filepath  =  folder_path + '/' + file
+					var filepath  =  file[1]
 					filepath = filepath.replace('/','\\')
 					filepath = PoolStringArray([filepath])
 					entry_line.set_episode(
@@ -146,9 +176,9 @@ func get_episode_nr_from_filename(filename:String):
 			var int_res = int(str_res)
 			return int_res
 		else:
-			print('The regex supplied should contain one () marker')
+			print_error('The regex supplied should contain one () marker')
 	else:
-		print('The regex was not found ')
+		print_error('The regex was not found ')
 	return -1
 	
 
@@ -176,7 +206,7 @@ func set_new_folder(path):
 	config.set_value("general", "folder_path", path)
 	config.save("user://settings.cfg")
 	$VBoxContainer/PathContainer/Path.text = path
-	
+	refresh()
 	
 #%% Input handling
 func _unhandled_input(event):
@@ -244,14 +274,6 @@ func find_entry(title):
 			return entry
 	return null
 
-func your_func_here(date_obj):
-	print(date_obj.date()) # Use the date_obj wisely :)
-
-
-func _on_CalendarButton_date_selected(date_obj):
-	print(date_obj)
-
-
 func _on_TextEditTitle_text_changed(new_text):
 	var add_del = $VBoxContainer/ContainerActionButtons/ButtonAddEntry
 	if find_entry(new_text):
@@ -276,52 +298,57 @@ func _on_TextEditDate_text_changed(_new_text):
 func _on_TextEditEpcount_text_changed(_new_text):
 	check_entry_is_valid()
 
-
-func _on_ButtonUpdateRSS_pressed():
-	print('starting download')
-	#RSS.download($VBoxContainer/ContainerRSS/LineEditRSS.text, 'user://RSS.xml', $VBoxContainer/ContainerRSS/ButtonUpdateRSS)
-	
-	#RSS.download($VBoxContainer/ContainerRSS/LineEditRSS.text,"/page?id=1",80,false) #domain,url,port,useSSL
-	#RSS.download("https://subsplease.org","/rss/?r=1080",80,false) #domain,url,port,useSSL
-	RSS.download("http://www.mocky.io","/v2/5185415ba171ea3a00704eed",80,false) #domain,url,port,useSSL
-	
-func _on_RSS_loading(loaded,total):
-	print(str(loaded*100/total),'%')
-	
-func _on_RSS_loaded(result):
-	var result_string = result.get_string_from_ascii()
-	print(result_string)
-
-
 func _on_LabelTitle_pressed():
 	if sort_by != sort_types.TITLE:
 		sort_by = sort_types.TITLE
 	else:
 		sort_dir = !sort_dir
-	refresh()
+	refresh(false)
 
 func _on_LabelProgress_pressed():
 	if sort_by != sort_types.PROGRESS:
 		sort_by = sort_types.PROGRESS
 	else:
 		sort_dir = !sort_dir
-	refresh()
+	refresh(false)
 
 func _on_LabelTimeRemaining_pressed():
 	if sort_by != sort_types.REMAINING:
 		sort_by = sort_types.REMAINING
 	else:
 		sort_dir = !sort_dir
-	refresh()
+	refresh(false)
 
 
 func _on_LineEditWatchScript_focus_exited():
-	refresh()
+	refresh(false)
 
 
 func _on_LineEditDownloadScript_focus_exited():
+	refresh(false)
+
+
+func _on_CheckBoxRecursive_toggled(button_pressed):
+	search_recursive = button_pressed
 	refresh()
 
+func _process(delta):
+	if message_fade_level<1:
+		message_fade_counter += delta
+		#if message_fade_counter>0.1:
+			#message_fade_counter = 0
+			#message_fade_level+=0.01
+		message_fade_level = exp(message_fade_counter)/30
+		message_color.a = 1-message_fade_level
+		$VBoxContainer/LabelMessage.set_modulate(message_color)
+	else:
+		message_fade_counter = 0
 
-func _on_CheckBox_toggled(button_pressed):
-	search_recursive = button_pressed
+
+func _on_LabelMessage_mouse_entered():
+	message_fade_level = 0
+	message_fade_counter = 0
+
+
+func _on_LineEdit_text_changed(new_text):
+	refresh(false)

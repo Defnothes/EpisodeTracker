@@ -79,7 +79,7 @@ func generate_magnet_from_JSON(body):
 	var json = JSON.parse(body.get_string_from_utf8())
 	#print(json.result['torrents'][0]['name'])
 	#print(json.result['torrents'][0]['magnet'])
-	if len(json.result['torrents'])==0:
+	if (not ('torrents' in json.result)) or (len(json.result['torrents'])==0):
 		return
 	return json.result['torrents'][0]['magnet']
 	#return '/'+str(title)+'-'+str(episode)
@@ -132,7 +132,7 @@ func list_files_in_directory(path, recursive = false):
 		var file_name = dir.get_next()
 		while (file_name != ""):
 			if not dir.current_is_dir():
-				file_list.append(file_name)
+				file_list.append([file_name, path+'/'+file_name])
 			elif recursive and file_name != '.' and file_name!='..':
 				file_list += list_files_in_directory(path + '/' +file_name, true)
 			file_name = dir.get_next()
