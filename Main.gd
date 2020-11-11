@@ -4,7 +4,6 @@ var config
 var entry_list = []
 var folder_path = ""
 var RSS
-var regex_ep :RegEx
 enum sort_types {TITLE, PROGRESS, REMAINING, NONE}
 var sort_by = null
 var sort_dir = true
@@ -17,7 +16,6 @@ var message_color = Color(1,1,1,0)
 var files = []
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	regex_ep = Global.default_epnr_regex
 	
 	config = ConfigFile.new()
 	var err = config.load("user://settings.cfg")
@@ -99,22 +97,30 @@ func refresh(reload_files = true):
 			$VBoxContainer/ContainerDownloadScript/LineEditDownloadScript.text,
 			self)
 		
+		var episodes_found = []
 		for file in files:
 			if entry['title'].to_upper() in file[0].to_upper():
-				var ep_nr = get_episode_nr_from_filename(file[0])
-				if ep_nr == -1:
-					print_error('Something unexpected went wrong with the regex')
-				else:
-					var filepath  =  file[1]
-					filepath = filepath.replace('/','\\')
-					filepath = PoolStringArray([filepath])
-					entry_line.set_episode(
-						ep_nr, 
-						Global.status.DOWNLOADED, 
-						[$VBoxContainer/ContainerWatchScript/LineEditWatchScript.text, filepath]
-						)
+				var ep_nr = Global.get_episode_nr_from_filename(file[0])
+				episodes_found.append(ep_nr)
+				var is_finished = Global.check_finished_filename(file[0])
+				match ep_nr:
+					-3:
+						print_error('The regex was not found ')
+					-2:
+						print_error('The regex supplied should contain one () marker')
+					-1:
+						print_error('Something unexpected went wrong with the regex')
+					_:
+						var filepath  =  file[1]
+						filepath = filepath.replace('/','\\')
+						filepath = PoolStringArray([filepath])
+						entry_line.set_episode(
+							ep_nr, 
+							Global.status.DOWNLOADED if is_finished else Global.status.DOWNLOADING, 
+							[$VBoxContainer/ContainerWatchScript/LineEditWatchScript.text, filepath]
+							)
 		if 'watched' in entry:
-			entry_line.update_watched_list(entry['watched'])
+			entry_line.update_watched_list(entry['watched'], episodes_found)
 	_on_TextEditTitle_text_changed($VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text)
 	#var date_thing = load("res://addons/calendar_button/popup.tscn").instance()
 	#$VBoxContainer/ScrollContainer/ContainerEntryList.add_child(date_thing)
@@ -168,19 +174,6 @@ func fill_details(title, date, epcount):
 	$VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.set_text(str(epcount))
 	_on_TextEditTitle_text_changed(title)
 
-func get_episode_nr_from_filename(filename:String):
-	var res = regex_ep.search(filename)
-	if res != null:
-		var str_res = res.get_string(1)
-		if res != null:
-			var int_res = int(str_res)
-			return int_res
-		else:
-			print_error('The regex supplied should contain one () marker')
-	else:
-		print_error('The regex was not found ')
-	return -1
-	
 
 func create_file_dialog(viewport_rect : Rect2, parent: Node, 
 						access_mode, filters):

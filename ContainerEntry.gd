@@ -98,11 +98,15 @@ func set_watched_episode(episode, already_watched):
 		last_watched = Global.string_from_date_time(OS.get_datetime())
 	parent.update_watched($LabelTitle.text, watched, last_watched)
 
-func update_watched_list(watched_eps):
+func update_watched_list(watched_eps, found_eps):
 	self.watched = watched_eps
 	for ep in watched_eps:
 		if ep<len(episodes):
-			episodes[ep].set_status(Global.status.WATCHED,ep)
+			if ep+1 in found_eps:
+				episodes[ep].set_status(Global.status.WATCHED,ep)
+			else:
+				episodes[ep].set_status(Global.status.DELETED,ep)
+		
 			
 func set_time_remaining():
 	var time_remaining = 9223372036854775807

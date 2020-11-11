@@ -34,7 +34,7 @@ func set_watch_callback(action):
 	
 func set_download_callback(download_script, title, quality, subber):
 	dl_script = download_script
-	dl_params = Global.generate_api_request_URI(title, index, quality, subber)
+	dl_params = Global.generate_api_request_URI(title, index+1, quality, subber)
 	
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -67,10 +67,18 @@ func _on_Button_pressed():
 				parent.print_info('Opening File: ' + str(watch_params))
 				OS.execute(watch_script, watch_params, false)
 		Global.status.RELEASED:
-			if dl_script!=null:
+			if Input.is_key_pressed(KEY_CONTROL):
+				set_status(Global.status.DELETED, index)
+				watched_parent.call(watched_callback, index, true)
+			elif dl_script!=null:
 				parent.print_info('Submitting API Req: ' + str(dl_params))
 				$HTTPRequest.request(dl_params)
 				#print(dl_script, dl_params)
+		Global.status.DELETED:
+			if Input.is_key_pressed(KEY_CONTROL):
+				set_status(Global.status.RELEASED,index)
+				watched_parent.call(watched_callback, index, false)
+			
 
 func call_magnet(result, response_code, headers, body):
 	var magnet = Global.generate_magnet_from_JSON(body)

@@ -7,6 +7,7 @@ extends Node
 enum status{
 	UNRELEASED,
 	RELEASED,
+	DOWNLOADING,
 	DOWNLOADED,
 	WATCHED,
 	DELETED	
@@ -16,19 +17,25 @@ var status2icon = {
 	status.UNRELEASED:preload("res://res/waiting.png"),
 	status.RELEASED:preload("res://res/download_2.png"),
 	status.DOWNLOADED:preload("res://res/View.png"),
-	status.WATCHED:preload("res://res/viewed.png"),
-	status.DELETED:preload("res://res/deleted.png")
+	status.DOWNLOADING:preload("res://res/download_in_progress.png"),
+	status.WATCHED:preload("res://res/Viewed.png"),
+	status.DELETED:preload("res://res/Viewed_deleted.png")
 }
 
-var default_epnr_regex : RegEx
-var time_regex : RegEx
+var video_extensions = ['.mp4', '.mkv', '.avi', '.mp3', '.mob', '.flv', '.wmv',
+						'webm', '.vob', '.ogv', '.ogg', '.mov', '.amv', '.m4p',
+						'.m4v', 'mpeg', '.m2v', '.svi', '.3gp', '.3g2', '.f4v',
+						'.f4p', '.f4p', '.f4b', '.f4a', '.f4v']
+
+var regex_epnr : RegEx
+var regex_time : RegEx
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	default_epnr_regex = RegEx.new()
-	time_regex = RegEx.new()
-	var _err = default_epnr_regex.compile('- (\\d\\d)')
-	_err = time_regex.compile('(\\d+)[\\./](\\d+)[\\./](\\d+) (\\d+):(\\d+)')
+	regex_epnr = RegEx.new()
+	regex_time = RegEx.new()
+	var _err = regex_epnr.compile('- (\\d\\d)')
+	_err = regex_time.compile('(\\d+)[\\./](\\d+)[\\./](\\d+) (\\d+):(\\d+)')
 	
 	for key in status2icon.keys():
 		var im = status2icon[key].get_data()
@@ -38,7 +45,7 @@ func _ready():
 	
 func unix_time_from_string(time_string):
 	time_string += (' 1:00')
-	var time_res = time_regex.search(time_string)
+	var time_res = regex_time.search(time_string)
 	if time_res == null:
 		return null
 		
@@ -65,6 +72,27 @@ func is_available_by_time(release_date, weeks_passed, pt=false):
 		' : ',secs_left/3600.0/24.0/7.0,
 		 ' ', weeks_passed)
 	return secs_left/3600.0/24.0/7.0>=weeks_passed
+
+func check_finished_filename(filename:String):
+	var extension = filename.substr(len(filename)-4)
+	if extension in video_extensions:
+		return true
+	else:
+		return false
+
+func get_episode_nr_from_filename(filename:String):
+	var res = regex_epnr.search(filename)
+	if res != null:
+		var str_res = res.get_string(1)
+		if res != null:
+			var int_res = int(str_res)
+			return int_res
+		else:
+			return -2
+	else:
+		return -3
+	return -1
+	
 
 func generate_api_request_URI(title:String, episode:int, quality:String = '', subber:String = ''):
 	title = title.replace(' ','+')
