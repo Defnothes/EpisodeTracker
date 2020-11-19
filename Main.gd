@@ -20,11 +20,12 @@ func _ready():
 	config = ConfigFile.new()
 	var err = config.load("user://settings.cfg")
 	if err == OK: # if not, something went wrong with the file loading
-				
-		
 		folder_path = config.get_value("general","folder_path","")
 		$VBoxContainer/PathContainer/Path.text = folder_path
-		
+		Global.download_URI = config.get_value('general', 'download_URI', 
+								"https://nyaa.net/api/search?q=%s%s+%02d%s")
+		Global.DB_URI = config.get_value('general', 'DB_URI', 
+								"https://myanimelist.net/anime.php?q=%s&cat=anime")
 		entry_list = config.get_value("entries","list",[])
 		
 		#DEBUG = config.get_value("debug","debug_enabled",false)
@@ -47,7 +48,7 @@ func _ready():
 	sort_by = config.get_value('general', 'sort_by', sort_types.NONE)
 	sort_dir = config.get_value('general', 'sort_dir', true)
 	search_recursive = config.get_value('general', 'search_recursive', false)
-	$VBoxContainer/PathContainer/CheckBoxRecursive.set_pressed(search_recursive)
+	$VBoxContainer/PathContainer/ContainerPathInteract/CheckBoxRecursive.set_pressed(search_recursive)
 	#$VBoxContainer/EntriesHeader/LabelProgress.rect_min_size =\
 	#	cont_ent.get_child(1).rect_min_size
 	refresh()
@@ -105,14 +106,15 @@ func refresh(reload_files = true):
 				var is_finished = Global.check_finished_filename(file[0])
 				match ep_nr:
 					-3:
-						print_error('The regex was not found ')
+						print_error('Ep nr was not found in ' + file[0])
 					-2:
 						print_error('The regex supplied should contain one () marker')
 					-1:
 						print_error('Something unexpected went wrong with the regex')
 					_:
 						var filepath  =  file[1]
-						filepath = filepath.replace('/','\\')
+						if OS.get_name() in ["Windows", "UWP", "Server"]:
+							filepath = filepath.replace('/','\\')
 						filepath = PoolStringArray([filepath])
 						entry_line.set_episode(
 							ep_nr, 
@@ -169,10 +171,30 @@ func update_watched(title, array, last_watched):
 
 #%% Utils
 func fill_details(title, date, epcount):
-	$VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.set_text(title)
-	$VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.set_text(date)
-	$VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.set_text(str(epcount))
-	_on_TextEditTitle_text_changed(title)
+	if Input.is_key_pressed(KEY_CONTROL):
+		var link = Global.DB_URI % [title]
+		link = link.replace(' ', '+')
+		print_info("Opening Page: " + link)
+		#OS.execute("C:/Program Files/Vivaldi/Application/vivaldi.exe", [link], true)
+		
+		var os_name = OS.get_name()
+		if os_name in ["Windows", "UWP", "Server"]:
+			OS.execute("start", ['""', link], true)
+		elif os_name == "X11":
+			OS.execute("open", [link], true)
+		elif os_name == "Android":
+			print_error('Android not supported')
+		elif os_name in ["iOS", "OSX"]:
+			OS.execute("curl", [link], true)
+		elif os_name in "HTML5":
+			print_error('Webredirect not supported in browser')
+		else:
+			print_error('Unkown OS detected')
+	else:
+		$VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.set_text(title)
+		$VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.set_text(date)
+		$VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.set_text(str(epcount))
+		_on_TextEditTitle_text_changed(title)
 
 
 func create_file_dialog(viewport_rect : Rect2, parent: Node, 
@@ -231,6 +253,9 @@ func save_all():
 	config.set_value("download", 'subber', $VBoxContainer/ContainerRSS/LineEditSubber.text)
 
 	config.set_value("entries", "list", entry_list)
+	
+	config.set_value('general', 'download_URI', Global.download_URI)
+	config.set_value('general', 'DB_URI', Global.DB_URI)
 	config.set_value('general', 'sort_by', sort_by)
 	config.set_value('general', 'sort_dir', sort_dir)
 	config.set_value('general', 'search_recursive', search_recursive)

@@ -55,21 +55,30 @@ func _on_Button_pressed():
 	match current_status:
 		Global.status.DOWNLOADED:
 			set_status(Global.status.WATCHED, index)
-			watched_parent.call(watched_callback, index, true)
+			watched_parent.call(watched_callback, index, Global.status.WATCHED)
 			if not Input.is_key_pressed(KEY_CONTROL):
 				parent.print_info('Opening File: ' + str(watch_params))
 				OS.execute(watch_script, watch_params, false)
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
-				set_status(Global.status.DOWNLOADED,index)
-				watched_parent.call(watched_callback, index, false)
+				set_status(Global.status.WATCHING,index)
+				watched_parent.call(watched_callback, index, Global.status.WATCHING)
 			else:
+				parent.print_info('Opening File: ' + str(watch_params))
+				OS.execute(watch_script, watch_params, false)
+		Global.status.WATCHING:
+			if Input.is_key_pressed(KEY_CONTROL):
+				set_status(Global.status.DOWNLOADED,index)
+				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED)
+			else:
+				set_status(Global.status.WATCHED,index)
+				watched_parent.call(watched_callback, index, Global.status.WATCHED)
 				parent.print_info('Opening File: ' + str(watch_params))
 				OS.execute(watch_script, watch_params, false)
 		Global.status.RELEASED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DELETED, index)
-				watched_parent.call(watched_callback, index, true)
+				watched_parent.call(watched_callback, index, Global.status.WATCHED)
 			elif dl_script!=null:
 				parent.print_info('Submitting API Req: ' + str(dl_params))
 				$HTTPRequest.request(dl_params)
@@ -77,7 +86,7 @@ func _on_Button_pressed():
 		Global.status.DELETED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.RELEASED,index)
-				watched_parent.call(watched_callback, index, false)
+				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED)
 			
 
 func call_magnet(result, response_code, headers, body):

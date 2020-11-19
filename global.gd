@@ -9,6 +9,7 @@ enum status{
 	RELEASED,
 	DOWNLOADING,
 	DOWNLOADED,
+	WATCHING,
 	WATCHED,
 	DELETED	
 }
@@ -18,6 +19,7 @@ var status2icon = {
 	status.RELEASED:preload("res://res/download_2.png"),
 	status.DOWNLOADED:preload("res://res/View.png"),
 	status.DOWNLOADING:preload("res://res/download_in_progress.png"),
+	status.WATCHING:preload("res://res/Viewed_partial.png"),
 	status.WATCHED:preload("res://res/Viewed.png"),
 	status.DELETED:preload("res://res/Viewed_deleted.png")
 }
@@ -26,6 +28,9 @@ var video_extensions = ['.mp4', '.mkv', '.avi', '.mp3', '.mob', '.flv', '.wmv',
 						'webm', '.vob', '.ogv', '.ogg', '.mov', '.amv', '.m4p',
 						'.m4v', 'mpeg', '.m2v', '.svi', '.3gp', '.3g2', '.f4v',
 						'.f4p', '.f4p', '.f4b', '.f4a', '.f4v']
+
+var download_URI : String
+var DB_URI : String
 
 var regex_epnr : RegEx
 var regex_time : RegEx
@@ -96,7 +101,7 @@ func get_episode_nr_from_filename(filename:String):
 
 func generate_api_request_URI(title:String, episode:int, quality:String = '', subber:String = ''):
 	title = title.replace(' ','+')
-	return "https://nyaa.net/api/search?q=%s%s+%02d%s" % \
+	return download_URI % \
 			['[%s]+' % subber if subber != '' else '', 
 			title, 
 			episode, 

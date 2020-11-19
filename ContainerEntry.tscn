@@ -11,15 +11,35 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="LabelTitle" type="LinkButton" parent="."]
-margin_right = 250.0
+[node name="Spacer" type="Label" parent="."]
+margin_top = 3.0
+margin_right = 100.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 100, 0 )
+
+[node name="LabelTimeRemaining" type="Label" parent="."]
+margin_left = 104.0
+margin_top = 3.0
+margin_right = 214.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 110, 0 )
+
+[node name="LabelContainer" type="CenterContainer" parent="."]
+margin_left = 218.0
+margin_right = 488.0
 margin_bottom = 20.0
-rect_min_size = Vector2( 250, 0 )
+
+[node name="LabelTitle" type="LinkButton" parent="LabelContainer"]
+margin_top = 3.0
+margin_right = 270.0
+margin_bottom = 17.0
+rect_min_size = Vector2( 270, 8 )
+rect_clip_content = true
 text = "asd"
 
 [node name="ContainerSeasons" type="VBoxContainer" parent="."]
-margin_left = 254.0
-margin_right = 854.0
+margin_left = 492.0
+margin_right = 1092.0
 margin_bottom = 20.0
 rect_min_size = Vector2( 600, 0 )
 
@@ -29,12 +49,6 @@ rect_min_size = Vector2( 600, 0 )
 
 [node name="Button" parent="ContainerSeasons/ContainerProgress" instance=ExtResource( 2 )]
 visible = false
-
-[node name="LabelTimeRemaining" type="Label" parent="."]
-margin_left = 858.0
-margin_top = 3.0
-margin_right = 858.0
-margin_bottom = 17.0
 
 [node name="ButtonRunScript" type="Button" parent="."]
 visible = false

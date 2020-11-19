@@ -6,7 +6,7 @@ extends HBoxContainer
 # var b = "text"
 
 var episodes = []
-var watched = []
+var watched = {}
 var date
 var quality
 var subber
@@ -28,7 +28,7 @@ func set_properties(title, date, epcount, last_watched,
 					download_script,
 					callback_object):
 	parent = callback_object
-	$LabelTitle.text = title
+	$LabelContainer/LabelTitle.text = title
 	self.date = date
 	self.watched = watched
 	self.quality = quality
@@ -36,8 +36,8 @@ func set_properties(title, date, epcount, last_watched,
 	self.last_watched = last_watched
 	dl_script = download_script
 	_set_epcount(epcount)
-	var _err = $LabelTitle.connect("pressed", callback_object, 'fill_details', 
-						[$LabelTitle.text, date, len(episodes)])
+	var _err = $LabelContainer/LabelTitle.connect("pressed", callback_object, 'fill_details', 
+						[$LabelContainer/LabelTitle.text, date, len(episodes)])
 	set_time_remaining()
 	
 func _set_epcount(new_epcount):
@@ -78,7 +78,7 @@ func check_new_releases():
 		if ep.current_status == Global.status.UNRELEASED and \
 				Global.is_available_by_time(date, ep.index):
 			ep.set_status(Global.status.RELEASED, ep.index)
-			ep.set_download_callback(dl_script, $LabelTitle.text, quality, subber)
+			ep.set_download_callback(dl_script, $LabelContainer/LabelTitle.text, quality, subber)
 
 func set_episode(ep, stat, watch_action):
 	ep = ep-1
@@ -90,20 +90,34 @@ func set_episode(ep, stat, watch_action):
 		#episodes[ep].set_download_callback(dl_action)
 	
 	
-func set_watched_episode(episode, already_watched):
-	if not already_watched:
-		watched.erase(episode)
-	else:
-		watched.append(episode)
-		last_watched = Global.string_from_date_time(OS.get_datetime())
-	parent.update_watched($LabelTitle.text, watched, last_watched)
+func set_watched_episode(episode, watch_progress):
+	match watch_progress:
+		Global.status.DOWNLOADED:
+			watched.erase(episode)
+		Global.status.WATCHING:
+			watched[episode] = 0.5
+		Global.status.WATCHED:
+			watched[episode] = 1
+			last_watched = Global.string_from_date_time(OS.get_datetime())
+		_:
+			parent.print_error('Unexpected progress status: ' + str(watch_progress))
+	parent.update_watched($LabelContainer/LabelTitle.text, watched, last_watched)
 
 func update_watched_list(watched_eps, found_eps):
+	if typeof(watched_eps) == TYPE_ARRAY:
+		var watched_eps_t = {}
+		for we in watched_eps:
+			watched_eps_t[we] = 1
+		watched_eps = watched_eps_t
+		
 	self.watched = watched_eps
-	for ep in watched_eps:
+	for ep in watched_eps.keys():
 		if ep<len(episodes):
 			if ep+1 in found_eps:
-				episodes[ep].set_status(Global.status.WATCHED,ep)
+				if watched_eps[ep] >=0.9:
+					episodes[ep].set_status(Global.status.WATCHED,ep)
+				else:
+					episodes[ep].set_status(Global.status.WATCHING,ep)
 			else:
 				episodes[ep].set_status(Global.status.DELETED,ep)
 		
