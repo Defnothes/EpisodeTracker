@@ -6,7 +6,7 @@ var http
 func _init():
 	http = HTTPClient.new() # Create the Client.
 
-func download(URI, file_name, node_to_print_to):
+func download(URI, file_name, _node_to_print_to):
 	var err = 0
 	err = http.connect_to_host(URI, 80) # Connect to host/port.
 	assert(err == OK) # Make sure connection was OK.

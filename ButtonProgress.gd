@@ -18,7 +18,7 @@ var watched_callback
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	set_status(Global.status.UNRELEASED, -1)
-	$HTTPRequest.connect("request_completed", self, "call_magnet")
+	var _err = $HTTPRequest.connect("request_completed", self, "call_magnet")
 	
 func set_message_parent(mp):
 	parent = mp
@@ -40,8 +40,8 @@ func set_download_callback(download_script, title, quality, subber):
 #func _process(delta):
 #	pass
 
-func set_watched_callback(parent, method):
-	watched_parent = parent
+func set_watched_callback(object, method):
+	watched_parent = object
 	watched_callback = method
 
 #func _input(event):
@@ -52,20 +52,21 @@ func set_watched_callback(parent, method):
 #			print('right')
 
 func _on_Button_pressed():
+	var _err
 	match current_status:
 		Global.status.DOWNLOADED:
 			set_status(Global.status.WATCHED, index)
 			watched_parent.call(watched_callback, index, Global.status.WATCHED)
 			if not Input.is_key_pressed(KEY_CONTROL):
 				parent.print_info('Opening File: ' + str(watch_params))
-				OS.execute(watch_script, watch_params, false)
+				_err = OS.execute(watch_script, watch_params, false)
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.WATCHING,index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHING)
 			else:
 				parent.print_info('Opening File: ' + str(watch_params))
-				OS.execute(watch_script, watch_params, false)
+				_err = OS.execute(watch_script, watch_params, false)
 		Global.status.WATCHING:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DOWNLOADED,index)
@@ -74,7 +75,7 @@ func _on_Button_pressed():
 				set_status(Global.status.WATCHED,index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHED)
 				parent.print_info('Opening File: ' + str(watch_params))
-				OS.execute(watch_script, watch_params, false)
+				_err = OS.execute(watch_script, watch_params, false)
 		Global.status.RELEASED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DELETED, index)
@@ -89,11 +90,11 @@ func _on_Button_pressed():
 				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED)
 			
 
-func call_magnet(result, response_code, headers, body):
+func call_magnet(_result, _response_code, _headers, body):
 	var magnet = Global.generate_magnet_from_JSON(body)
 	if magnet!=null:
 		parent.print_info('Submitting Magent link: ' + str(magnet).substr(0,50) + '[...]')
-		OS.execute(dl_script, [magnet], false)
+		var _err = OS.execute(dl_script, [magnet], false)
 	else:
 		parent.print_error('Could not get magnet link from API response: '+
 							body.get_string_from_utf8().substr(0,50) + '[...]')

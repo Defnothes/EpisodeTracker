@@ -47,6 +47,8 @@ func _load(params):
 	
 	call_deferred("_send_loaded_signal")
 	http.close()
+	if err!= null:
+		print("Error found during http request, code = " + str(err))
 	return rb
 	
 func _send_loading_signal(l,t):

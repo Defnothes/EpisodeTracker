@@ -1,63 +1,56 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=4 format=2]
 
 [ext_resource path="res://ContainerEntry.gd" type="Script" id=1]
 [ext_resource path="res://ButtonProgress.tscn" type="PackedScene" id=2]
+[ext_resource path="res://styles/entry_style_transparent.stylebox" type="StyleBox" id=3]
 
-[node name="ContainerEntry" type="HBoxContainer"]
-margin_right = 1024.0
-margin_bottom = 20.0
+[node name="ContainerEntry" type="PanelContainer"]
+margin_left = 7.0
+margin_top = 7.0
+margin_right = 1109.0
+margin_bottom = 21.0
+custom_styles/panel = ExtResource( 3 )
 script = ExtResource( 1 )
 __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Spacer" type="Label" parent="."]
-margin_top = 3.0
-margin_right = 100.0
-margin_bottom = 17.0
-rect_min_size = Vector2( 100, 0 )
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+margin_right = 1102.0
+margin_bottom = 14.0
 
-[node name="LabelTimeRemaining" type="Label" parent="."]
-margin_left = 104.0
-margin_top = 3.0
-margin_right = 214.0
-margin_bottom = 17.0
+[node name="Spacer" type="Label" parent="HBoxContainer"]
+margin_right = 110.0
+margin_bottom = 14.0
 rect_min_size = Vector2( 110, 0 )
 
-[node name="LabelContainer" type="CenterContainer" parent="."]
-margin_left = 218.0
-margin_right = 488.0
-margin_bottom = 20.0
+[node name="LabelTimeRemaining" type="Label" parent="HBoxContainer"]
+margin_left = 114.0
+margin_right = 224.0
+margin_bottom = 14.0
+rect_min_size = Vector2( 110, 0 )
 
-[node name="LabelTitle" type="LinkButton" parent="LabelContainer"]
-margin_top = 3.0
+[node name="LabelContainer" type="CenterContainer" parent="HBoxContainer"]
+margin_left = 228.0
+margin_right = 498.0
+margin_bottom = 14.0
+
+[node name="LabelTitle" type="LinkButton" parent="HBoxContainer/LabelContainer"]
 margin_right = 270.0
-margin_bottom = 17.0
+margin_bottom = 14.0
 rect_min_size = Vector2( 270, 8 )
 rect_clip_content = true
 text = "asd"
 
-[node name="ContainerSeasons" type="VBoxContainer" parent="."]
-margin_left = 492.0
-margin_right = 1092.0
-margin_bottom = 20.0
-rect_min_size = Vector2( 600, 0 )
+[node name="ContainerSeasons" type="VBoxContainer" parent="HBoxContainer"]
+margin_left = 502.0
+margin_right = 1082.0
+margin_bottom = 14.0
+rect_min_size = Vector2( 500, 0 )
 
-[node name="ContainerProgress" type="HBoxContainer" parent="ContainerSeasons"]
-margin_right = 600.0
-rect_min_size = Vector2( 600, 0 )
+[node name="ContainerProgress" type="HBoxContainer" parent="HBoxContainer/ContainerSeasons"]
+margin_right = 580.0
+rect_min_size = Vector2( 580, 0 )
 
-[node name="Button" parent="ContainerSeasons/ContainerProgress" instance=ExtResource( 2 )]
+[node name="Button" parent="HBoxContainer/ContainerSeasons/ContainerProgress" instance=ExtResource( 2 )]
 visible = false
-
-[node name="ButtonRunScript" type="Button" parent="."]
-visible = false
-margin_left = 270.0
-margin_right = 282.0
-margin_bottom = 20.0
-
-[node name="ButtonChangeDate" type="Button" parent="."]
-visible = false
-margin_left = 270.0
-margin_right = 282.0
-margin_bottom = 20.0

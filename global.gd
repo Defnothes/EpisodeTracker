@@ -96,7 +96,7 @@ func get_episode_nr_from_filename(filename:String):
 			return -2
 	else:
 		return -3
-	return -1
+	
 	
 
 func generate_api_request_URI(title:String, episode:int, quality:String = '', subber:String = ''):
@@ -186,19 +186,19 @@ func load_from_file(file_name):
 	file.close()
 	return content
 
-func get_link_from_RSS(title, episode):
-	var file_name = 'user://RSS.xml'
-	var components = []
-	
-	var xml = XMLParser.new()
-	xml.open(file_name)
-	while xml.read() == OK:
-		if xml.get_node_type() == XMLParser.NODE_TEXT:
-			print(xml.get_node_data())
-			#var r_title = xml.get_named_attribute_value('d')
-			#print(r_title)
-	
-	return null
+#func get_link_from_RSS(title, episode):
+#	var file_name = 'user://RSS.xml'
+#	var components = []
+#	
+#	var xml = XMLParser.new()
+#	xml.open(file_name)
+#	while xml.read() == OK:
+#		if xml.get_node_type() == XMLParser.NODE_TEXT:
+#			print(xml.get_node_data())
+#			#var r_title = xml.get_named_attribute_value('d')
+#			#print(r_title)
+#	
+#	return null
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass

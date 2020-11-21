@@ -1,4 +1,4 @@
-extends HBoxContainer
+extends PanelContainer
 
 
 # Declare member variables here. Examples:
@@ -10,6 +10,11 @@ var watched = {}
 var date
 var quality
 var subber
+
+enum COLORS {GREY, TRANS, HIGHLIGHT}
+onready var bg_colors = {COLORS.GREY:preload("res://styles/entry_style_grey.stylebox"),
+						COLORS.TRANS:preload("res://styles/entry_style_transparent.stylebox"),
+						COLORS.HIGHLIGHT:null}
 
 var parent = null
 
@@ -28,7 +33,7 @@ func set_properties(title, date, epcount, last_watched,
 					download_script,
 					callback_object):
 	parent = callback_object
-	$LabelContainer/LabelTitle.text = title
+	$HBoxContainer/LabelContainer/LabelTitle.text = title
 	self.date = date
 	self.watched = watched
 	self.quality = quality
@@ -36,8 +41,8 @@ func set_properties(title, date, epcount, last_watched,
 	self.last_watched = last_watched
 	dl_script = download_script
 	_set_epcount(epcount)
-	var _err = $LabelContainer/LabelTitle.connect("pressed", callback_object, 'fill_details', 
-						[$LabelContainer/LabelTitle.text, date, len(episodes)])
+	var _err = $HBoxContainer/LabelContainer/LabelTitle.connect("pressed", callback_object, 'fill_details', 
+						[$HBoxContainer/LabelContainer/LabelTitle.text, date, len(episodes)])
 	set_time_remaining()
 	
 func _set_epcount(new_epcount):
@@ -69,7 +74,7 @@ func get_progress_container(index, limit):
 		
 	while container_index >= len(progress_containers):
 		var hcontainer = HBoxContainer.new()
-		$ContainerSeasons.add_child(hcontainer)
+		$HBoxContainer/ContainerSeasons.add_child(hcontainer)
 		progress_containers.append(hcontainer)
 	return progress_containers[container_index]
 
@@ -78,7 +83,7 @@ func check_new_releases():
 		if ep.current_status == Global.status.UNRELEASED and \
 				Global.is_available_by_time(date, ep.index):
 			ep.set_status(Global.status.RELEASED, ep.index)
-			ep.set_download_callback(dl_script, $LabelContainer/LabelTitle.text, quality, subber)
+			ep.set_download_callback(dl_script, $HBoxContainer/LabelContainer/LabelTitle.text, quality, subber)
 
 func set_episode(ep, stat, watch_action):
 	ep = ep-1
@@ -101,7 +106,7 @@ func set_watched_episode(episode, watch_progress):
 			last_watched = Global.string_from_date_time(OS.get_datetime())
 		_:
 			parent.print_error('Unexpected progress status: ' + str(watch_progress))
-	parent.update_watched($LabelContainer/LabelTitle.text, watched, last_watched)
+	parent.update_watched($HBoxContainer/LabelContainer/LabelTitle.text, watched, last_watched)
 
 func update_watched_list(watched_eps, found_eps):
 	if typeof(watched_eps) == TYPE_ARRAY:
@@ -132,4 +137,11 @@ func set_time_remaining():
 				break
 			
 	self.time_remaining_unix = time_remaining
-	$LabelTimeRemaining.set_text(Global.seconds_to_string(-time_remaining))
+	$HBoxContainer/LabelTimeRemaining.set_text(Global.seconds_to_string(-time_remaining))
+
+func set_color(color):
+	var true_color : StyleBoxFlat = bg_colors[color]
+	add_stylebox_override('panel', true_color)
+	if color==COLORS.TRANS:
+		var new_color = Color(0.83,0.83,0.83, 1)
+		$HBoxContainer/ContainerSeasons.set_modulate(new_color)

@@ -80,34 +80,34 @@ margin_right = 1101.0
 margin_bottom = 56.0
 
 [node name="Spacer" type="Label" parent="VBoxContainer/EntriesHeader"]
-margin_right = 100.0
+margin_right = 110.0
 margin_bottom = 14.0
-rect_min_size = Vector2( 100, 0 )
+rect_min_size = Vector2( 110, 0 )
 
 [node name="LabelTimeRemaining" type="LinkButton" parent="VBoxContainer/EntriesHeader"]
-margin_left = 104.0
-margin_right = 214.0
+margin_left = 114.0
+margin_right = 224.0
 margin_bottom = 14.0
 rect_min_size = Vector2( 110, 0 )
 text = "Next Ep"
 
 [node name="LabelTitle" type="LinkButton" parent="VBoxContainer/EntriesHeader"]
-margin_left = 218.0
-margin_right = 488.0
+margin_left = 228.0
+margin_right = 498.0
 margin_bottom = 14.0
 rect_min_size = Vector2( 270, 0 )
 text = "Title"
 
 [node name="LabelProgress" type="LinkButton" parent="VBoxContainer/EntriesHeader"]
-margin_left = 492.0
-margin_right = 892.0
+margin_left = 502.0
+margin_right = 902.0
 margin_bottom = 14.0
 rect_min_size = Vector2( 400, 0 )
 text = "Progress"
 
 [node name="Label" type="Label" parent="VBoxContainer/EntriesHeader"]
-margin_left = 896.0
-margin_right = 1091.0
+margin_left = 906.0
+margin_right = 1101.0
 margin_bottom = 14.0
 rect_min_size = Vector2( 195, 0 )
 
