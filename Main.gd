@@ -58,7 +58,7 @@ func _ready():
 	#$VBoxContainer/EntriesHeader/LabelProgress.rect_min_size =\
 	#	cont_ent.get_child(1).rect_min_size
 	
-	highlight_entries = config.get_value('visuals', 'highlight_entries', false)
+	highlight_entries = config.get_value('visuals', 'highlight_entries', true)
 	
 	refresh()
 
