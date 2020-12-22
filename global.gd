@@ -40,7 +40,7 @@ func _ready():
 	regex_epnr = RegEx.new()
 	regex_time = RegEx.new()
 	var _err = regex_epnr.compile('- (\\d\\d)')
-	_err = regex_time.compile('(\\d+)[\\./](\\d+)[\\./](\\d+) (\\d+):(\\d+)')
+	_err = regex_time.compile('(\\d+)[\\./](\\d+)[\\./](\\d+)\\.? (\\d+):(\\d+)')
 	
 	for key in status2icon.keys():
 		var im = status2icon[key].get_data()
@@ -186,10 +186,35 @@ func load_from_file(file_name):
 	file.close()
 	return content
 
-#func get_link_from_RSS(title, episode):
+func generate_magnet_from_RSS(body):
+	var parser = XMLParser.new();
+	var magnet = null;
+	var error = parser.open_buffer(body);
+	if error != 0:
+			return "Error with URL";
+	var finished_reading = false;
+	while (!finished_reading):
+		error = parser.read();
+		if error == 18:
+			return "No results for query";
+		if error != 0:
+			return "Error parsing XML";
+		if parser.get_node_type() != 3:
+			var node_name = parser.get_node_name();
+			if node_name == "link":
+				error = parser.read();
+				var node_data = parser.get_node_data();
+				if node_data != "https://nyaa.si/":
+					finished_reading = true;
+					magnet = node_data;
+				error = parser.read();
+				error = parser.read();
+	return magnet;
+
+#func get_link_from_RSS_depr(title, episode):
 #	var file_name = 'user://RSS.xml'
 #	var components = []
-#	
+#
 #	var xml = XMLParser.new()
 #	xml.open(file_name)
 #	while xml.read() == OK:
@@ -197,7 +222,7 @@ func load_from_file(file_name):
 #			print(xml.get_node_data())
 #			#var r_title = xml.get_named_attribute_value('d')
 #			#print(r_title)
-#	
+#
 #	return null
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):

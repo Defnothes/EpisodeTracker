@@ -91,8 +91,8 @@ func _on_Button_pressed():
 			
 
 func call_magnet(_result, _response_code, _headers, body):
-	var magnet = Global.generate_magnet_from_JSON(body)
-	if magnet!=null:
+	var magnet = Global.generate_magnet_from_RSS(body)
+	if magnet.find("torrent") > -1:
 		parent.print_info('Submitting Magent link: ' + str(magnet).substr(0,50) + '[...]')
 		var _err = OS.execute(dl_script, [magnet], false)
 	else:
