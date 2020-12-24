@@ -211,6 +211,56 @@ func generate_magnet_from_RSS(body):
 				error = parser.read();
 	return magnet;
 
+var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
+	[center]Press any key or click on [u]Help[/u] to close this window[/center]
+	
+		Header:
+				Enabling [u]Recursive[/u] next to the folder selector will enable searching sub-folders as well
+				Press F5 to refresh/search the directories again
+	
+		Column Titles:
+				Click on [u]Next Ep[/u] or [u]Title[/u] to sort by those values respectively, clicking [u]Progress[/u] sorts by the date the show was last watched.
+				Clicking the column title again reverses the search
+		
+		Titles:
+				Clicking on titles fills their information into the fields at the bottom.
+				[u]Ctrl-Click:[/u] Opens MAL link with the anime title searched
+				[u][b]To edit the properties of a title, click on the title, click delete (the fields will be still filled in with the same data), edit the field you want.[/b][/u]
+				[u][b]Click add after you have finished editing[/b][/u]
+			
+				Status Button Legend:
+						[b]Hourglass[/b]: Unreleased ― Release dates are calculated based on the 'Date' field below
+						[b]Green Arrow[/b]: Downloadable ― Click to fetch magnet link
+						[b]Green Arrow with red dots[/b]: Downloading ― unfinished download, download is probably in progress
+						[b]Eye[/b]: Ready ― Click to watch -> sets status to watched
+						[b]Ticked Eye[/b]: Watched ― Click to watch
+						[b]Eye with Blue Triangle[/b]: Half-Watched ― Click to watch → sets status to watched
+						[b]Grey Ticked Eye[/b]: Deleted ― watched, but file not found
+						[u]Ctrl-Click[/u]: toggles between statuses without performing any action (last watched timestamp is not updated either)
+								Downloadable ↔ Deleted
+								Ready → Watched → Half-Watched → Ready → ...
+						[u]These statuses are not updated automatically if the file is modified outside of the program. Press F5 to refresh[/u]
+					
+		Show Details:
+				[u][b]Date:[/b][/u] The air date of the first episode ― [u]Release dates are calculated based on this [/u]
+					[u][b]Format[/b][/u]: y[./]m[./]d.? h:m , hour and minute optional
+						e.g. [b]20.12.30[/b] OR [b]20/12/30[/b] OR [b]2020.12.30[/b] OR [b]20.12.30.[/b] OR [b]20.12.30 22:30[/b] etc.
+				The anime will be searched for in the following form [<Subber>]<Title>+<episode>+<quality>. Subber and quality are optional. 
+				The first matching result is returned as the download link, any others are discarded.
+		
+		Watch and download details:
+				[u]Watch Script:[/u] The path to your video player's executable (e.g. C:/[...]/vlc.exe). The filename is given as an argument. Tested player: VLC
+				[u]Download Script:[/u] The Path to the bittorrent application executable. The magnet is given as a parameter, should work on most clients
+			
+		Pseudo-toast:
+				The latest message will pop up for a short period of time at the bottom of the window. Hover to see the last message
+			
+		[b]Hotkeys[/b]:
+			F5: to refresh/search the directories again
+			Ctrl-H: Enable/Disable highlighting of alterate rows
+	[center]Press any key or click on [u]Help[/u] to close this window[/center]
+	
+	"""
 #func get_link_from_RSS_depr(title, episode):
 #	var file_name = 'user://RSS.xml'
 #	var components = []
