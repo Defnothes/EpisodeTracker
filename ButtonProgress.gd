@@ -51,22 +51,33 @@ func set_watched_callback(object, method):
 #		if event.button_index == BUTTON_RIGHT:
 #			print('right')
 
+func _play_file():
+	parent.print_info('Opening File: ' + str(watch_params))
+	var _err = OS.execute(watch_script, watch_params, false)
+	
+func _clip_file():
+	parent.print_info('Copied path to clipboard: ' + str(watch_params[0]))
+	OS.set_clipboard(str(watch_params[0]))
+
 func _on_Button_pressed():
 	var _err
 	match current_status:
 		Global.status.DOWNLOADED:
 			set_status(Global.status.WATCHED, index)
-			watched_parent.call(watched_callback, index, Global.status.WATCHED)
 			if not Input.is_key_pressed(KEY_CONTROL):
-				parent.print_info('Opening File: ' + str(watch_params))
-				_err = OS.execute(watch_script, watch_params, false)
+				watched_parent.call(watched_callback, index, Global.status.WATCHED)
+				if Input.is_key_pressed(KEY_ALT):
+					_clip_file()
+				else:
+					_play_file()
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.WATCHING,index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHING)
+			elif Input.is_key_pressed(KEY_ALT):
+				_clip_file()
 			else:
-				parent.print_info('Opening File: ' + str(watch_params))
-				_err = OS.execute(watch_script, watch_params, false)
+				_play_file()
 		Global.status.WATCHING:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DOWNLOADED,index)
@@ -74,13 +85,15 @@ func _on_Button_pressed():
 			else:
 				set_status(Global.status.WATCHED,index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHED)
-				parent.print_info('Opening File: ' + str(watch_params))
-				_err = OS.execute(watch_script, watch_params, false)
+				if Input.is_key_pressed(KEY_ALT):
+					_clip_file()
+				else:
+					_play_file()
 		Global.status.RELEASED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DELETED, index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHED)
-			elif dl_script!=null:
+			elif dl_script!=null and not Input.is_key_pressed(KEY_ALT):
 				parent.print_info('Submitting API Req: ' + str(dl_params))
 				$HTTPRequest.request(dl_params)
 				#print(dl_script, dl_params)
