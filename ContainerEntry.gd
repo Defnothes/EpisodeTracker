@@ -33,6 +33,15 @@ func set_properties(title, date, epcount, last_watched,
 					download_script,
 					callback_object):
 	parent = callback_object
+	if title.length()>34:
+		var right_cut = title.length()-5
+		
+		var last_space = title.find_last(' ') 
+		if last_space != -1 and last_space > title.length()-10:
+			right_cut = last_space
+			
+		title=title.left(29 - (title.length() - right_cut))+ "[...]" + title.right(right_cut)
+		
 	$HBoxContainer/LabelContainer/LabelTitle.text = title
 	self.date = date
 	self.watched = watched
