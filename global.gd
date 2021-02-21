@@ -64,10 +64,22 @@ func unix_time_from_string(time_string):
 	if int(time_dict['year']) <100:
 		time_dict['year'] = '20' + time_dict['year']
 	
-	return OS.get_unix_time_from_datetime(time_dict)
+	#now that's future-proofing :))
+	if int(time_dict['year']) <1970  or int(time_dict['year']) > 3000\
+	or int(time_dict['month']) <=0 or int(time_dict['month']) >12 \
+	or int(time_dict['day']) <=0 or int(time_dict['day']) >31 \
+	or int(time_dict['hour']) <0 or int(time_dict['hour'])>=24 \
+	or int(time_dict['minute']) <0 or int(time_dict['minute']) >= 60:
+		return null
+		
+	var attempted_date = OS.get_unix_time_from_datetime(time_dict)
+	if attempted_date == 0:
+		return null
+		
+	return attempted_date
 
 func string_from_date_time(datetime):
-	return '%d.%d.%d %d:%d' % [
+	return '%d.%d.%d %02d:%02d' % [
 		datetime['year'],datetime['month'],datetime['day'],
 		datetime['hour'],datetime['minute']]
 
@@ -230,8 +242,8 @@ var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 		Titles:
 				Clicking on titles fills their information into the fields at the bottom.
 				[u]Ctrl-Click:[/u] Opens MAL link with the anime title searched
-				[u][b]To edit the properties of a title, click on the title, click delete (the fields will be still filled in with the same data), edit the field you want.[/b][/u]
-				[u][b]Click add after you have finished editing[/b][/u]
+				If the Edit button is disabled, the date or episode count is invalid, or none of the fields have been changed
+				If the Add button is disabled, the date or episode count is invalid. If the name already matches an existing title, it is replaced with 'Delete'
 			
 				Status Button Legend:
 						[b]Hourglass[/b]: Unreleased ― Release dates are calculated based on the 'Date' field below

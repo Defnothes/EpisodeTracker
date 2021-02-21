@@ -115,4 +115,4 @@ func call_magnet(_result, _response_code, _headers, body):
 		var _err = OS.execute(dl_script, [magnet], false)
 	else:
 		parent.print_error('Could not get magnet link from API response: '+
-							body.get_string_from_utf8().substr(0,50) + '[...]')
+							body.get_string_from_utf8())

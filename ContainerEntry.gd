@@ -53,7 +53,7 @@ func set_properties(title, date, epcount, last_watched,
 	dl_script = download_script
 	_set_epcount(epcount)
 	var _err = $HBoxContainer/LabelContainer/LabelTitle.connect("pressed", callback_object, 'fill_details', 
-						[self.title, date, len(episodes)])
+						[self.title, date, len(episodes), self.quality, self.subber])
 	set_time_remaining()
 	
 func _set_epcount(new_epcount):
@@ -93,7 +93,10 @@ func check_new_releases():
 	for ep in episodes:
 		if ep.current_status == Global.status.UNRELEASED and \
 				Global.is_available_by_time(date, ep.index):
-			ep.set_status(Global.status.RELEASED, ep.index)
+			if parent.find_node('ButtonLockOn').visible:
+				ep.set_status(Global.status.LOCKED, ep.index)
+			else:
+				ep.set_status(Global.status.RELEASED, ep.index)
 			ep.set_download_callback(dl_script, title, quality, subber)
 
 func set_episode(ep, stat, watch_action):

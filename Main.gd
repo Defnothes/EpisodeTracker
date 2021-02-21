@@ -17,6 +17,7 @@ var message_color = Color(1,1,1,0)
 
 var lock_permaopen = false
 
+var last_clicked_entry_title = ''
 var files = []
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -80,14 +81,19 @@ func print_info(message):
 func print_error(message):
 	message_color = Color(1,0,0,1)
 	_message_set_text(message)
-	
-func print_log(_message):
-	pass
 
 func _message_set_text(message):
 	print(message)
+	var current_date = OS.get_datetime()
+	var date_string = Global.string_from_date_time(current_date) + ':' +\
+		'%02d' % [current_date['second']]
+	$ContainerDebug/LabelDebug.set_text(
+		'\t[' + date_string + ']  ' + 
+		message + '\n' + $ContainerDebug/LabelDebug.text)
 	message_fade_level = 0
 	message_fade_counter = 0
+	if len(message)>110:
+		message = message.left(110) + '[...]'
 	$VBoxContainer/LabelMessage.set_text(message)
 
 func passes_filter(title:String):
@@ -97,6 +103,7 @@ func passes_filter(title:String):
 	return false
 	
 func refresh(reload_files = true):
+	
 	# Etry list
 	for _i in range(0, $VBoxContainer/ScrollContainer/ContainerEntryList.get_child_count()):
 		var child = $VBoxContainer/ScrollContainer/ContainerEntryList.get_child(0)
@@ -195,7 +202,7 @@ func update_watched(title, array, last_watched):
 	refresh(false)
 
 #%% Utils
-func fill_details(title, date, epcount):
+func fill_details(title, date, epcount, quality = null, subber = null):
 	var _err
 	if Input.is_key_pressed(KEY_CONTROL):
 		var link = Global.DB_URI % [title]
@@ -220,6 +227,12 @@ func fill_details(title, date, epcount):
 		$VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.set_text(title)
 		$VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.set_text(date)
 		$VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.set_text(str(epcount))
+		if quality != null:
+			$VBoxContainer/ContainerRSS/LineEditQuality.set_text(str(quality))
+		if subber != null:
+			$VBoxContainer/ContainerRSS/LineEditSubber.set_text(subber)
+		last_clicked_entry_title = title
+		$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = title == ''
 		_on_TextEditTitle_text_changed(title)
 
 
@@ -290,6 +303,8 @@ func _unhandled_input(event):
 				highlight_entries = !highlight_entries
 				print_info('Highlighting %sabled' % ('en' if highlight_entries else 'dis'))
 				refresh(false)
+			elif event.scancode == KEY_D and Input.is_key_pressed(KEY_CONTROL):
+				$ContainerDebug.visible = !$ContainerDebug.visible
 			elif event.scancode == KEY_T and Input.is_key_pressed(KEY_CONTROL):
 				autocomplete_enabled = !autocomplete_enabled
 				print_info('Autocomplete %sabled' % ('en' if autocomplete_enabled else 'dis'))
@@ -359,7 +374,12 @@ func _on_ButtonAddEntry_pressed():
 			'quality':$VBoxContainer/ContainerRSS/LineEditQuality.text,
 			'subber':$VBoxContainer/ContainerRSS/LineEditSubber.text}
 			)
+			
+		$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = false
+		last_clicked_entry_title = $VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text
 	elif add_del.text == 'Delete':
+		last_clicked_entry_title = ''
+		$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = true
 		var entry = find_entry($VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text)
 		entry_list.erase(entry)
 		
@@ -367,12 +387,31 @@ func _on_ButtonAddEntry_pressed():
 	config.save("user://settings.cfg")
 	refresh()
 
+
+func _on_ButtonUpdateEntry_pressed():
+	for entry in entry_list:
+		if entry['title'] == last_clicked_entry_title:
+			entry['title'] = $VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text 
+			entry['date'] = $VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.text 
+			entry['epcount'] = $VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.text
+			entry['quality'] = $VBoxContainer/ContainerRSS/LineEditQuality.text 
+			entry['subber'] = $VBoxContainer/ContainerRSS/LineEditSubber.text
+			break
+		
+	config.set_value("entries", "list", entry_list)
+	config.save("user://settings.cfg")
+	refresh()
+	
+	last_clicked_entry_title = $VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text
+	refresh_update_button()
+
 func find_entry(title):
 	for entry in entry_list:
 		if title == entry['title']:
 			return entry
 	return null
 
+#Only used in this function to check wether autocomplete needs to be triggered
 var old_text_title = ''
 func _on_TextEditTitle_text_changed(new_text):
 	var add_del = $VBoxContainer/ContainerActionButtons/ButtonAddEntry
@@ -388,23 +427,53 @@ func _on_TextEditTitle_text_changed(new_text):
 			var epcount_field = $VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount
 			if epcount_field.text == '':
 				epcount_field.text = '12'
-	check_entry_is_valid()
+	refresh_update_button()
+				
+	refresh_add_delete_button()
 	old_text_title = new_text
 
 func check_entry_is_valid():
-	if (Global.unix_time_from_string($VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.text) != null and \
-		len($VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text)>=1 and\
-		int($VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.text)>1) or\
-		$VBoxContainer/ContainerActionButtons/ButtonAddEntry.text == 'Delete':
+	return (Global.unix_time_from_string($VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.text) != null \
+		and len($VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text)>=1 \
+		and int($VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.text)>=1)
+
+
+func refresh_add_delete_button():
+	if check_entry_is_valid() or $VBoxContainer/ContainerActionButtons/ButtonAddEntry.text == 'Delete':
 		$VBoxContainer/ContainerActionButtons/ButtonAddEntry.disabled = false
 	else:
 		$VBoxContainer/ContainerActionButtons/ButtonAddEntry.disabled = true
+		
+func refresh_update_button():
+	if check_entry_is_valid():
+		if last_clicked_entry_title != '':
+			for entry in entry_list:
+				if entry['title'] == last_clicked_entry_title:
+					if entry['title'] != $VBoxContainer/ContainerActionButtons/ContainerTitleEdit/TextEditTitle.text \
+					or entry['date'] != $VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.text \
+					or entry['epcount'] != $VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount.text\
+					or entry['quality'] != $VBoxContainer/ContainerRSS/LineEditQuality.text \
+					or entry['subber'] != $VBoxContainer/ContainerRSS/LineEditSubber.text:
+						$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = false
+						break
+				else: #maybe less eficient, but cleaner
+					$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = true
+	else:
+		$VBoxContainer/ContainerActionButtons/ButtonUpdateEntry.disabled = true
 
 func _on_TextEditDate_text_changed(_new_text):
-	check_entry_is_valid()
+	refresh_add_delete_button()
+	refresh_update_button()
 
 func _on_TextEditEpcount_text_changed(_new_text):
-	check_entry_is_valid()
+	refresh_add_delete_button()
+	refresh_update_button()
+	
+func _on_LineEditSubber_text_changed(new_text):
+	refresh_update_button()
+
+func _on_LineEditQuality_text_changed(new_text):
+	refresh_update_button()
 
 func _on_LabelTitle_pressed():
 	if sort_by != sort_types.TITLE:
@@ -477,3 +546,7 @@ func _on_ButtonLockOff_pressed():
 func _on_ButtonLockOn_pressed():
 	lock_permaopen = true
 	unlock_downloads()
+
+
+
+
