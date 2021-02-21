@@ -5,6 +5,7 @@ extends PanelContainer
 # var a = 2
 # var b = "text"
 
+var title 
 var episodes = []
 var watched = {}
 var date
@@ -33,6 +34,7 @@ func set_properties(title, date, epcount, last_watched,
 					download_script,
 					callback_object):
 	parent = callback_object
+	self.title = title
 	if title.length()>34:
 		var right_cut = title.length()-5
 		
@@ -51,7 +53,7 @@ func set_properties(title, date, epcount, last_watched,
 	dl_script = download_script
 	_set_epcount(epcount)
 	var _err = $HBoxContainer/LabelContainer/LabelTitle.connect("pressed", callback_object, 'fill_details', 
-						[$HBoxContainer/LabelContainer/LabelTitle.text, date, len(episodes)])
+						[self.title, date, len(episodes)])
 	set_time_remaining()
 	
 func _set_epcount(new_epcount):
@@ -92,7 +94,7 @@ func check_new_releases():
 		if ep.current_status == Global.status.UNRELEASED and \
 				Global.is_available_by_time(date, ep.index):
 			ep.set_status(Global.status.RELEASED, ep.index)
-			ep.set_download_callback(dl_script, $HBoxContainer/LabelContainer/LabelTitle.text, quality, subber)
+			ep.set_download_callback(dl_script, title, quality, subber)
 
 func set_episode(ep, stat, watch_action):
 	ep = ep-1
@@ -104,7 +106,7 @@ func set_episode(ep, stat, watch_action):
 		#episodes[ep].set_download_callback(dl_action)
 	
 	
-func set_watched_episode(episode, watch_progress):
+func set_watched_episode(episode, watch_progress, update_timestamp = true):
 	match watch_progress:
 		Global.status.DOWNLOADED:
 			watched.erase(episode)
@@ -112,10 +114,11 @@ func set_watched_episode(episode, watch_progress):
 			watched[episode] = 0.5
 		Global.status.WATCHED:
 			watched[episode] = 1
-			last_watched = Global.string_from_date_time(OS.get_datetime())
+			if update_timestamp:
+				last_watched = Global.string_from_date_time(OS.get_datetime())
 		_:
 			parent.print_error('Unexpected progress status: ' + str(watch_progress))
-	parent.update_watched($HBoxContainer/LabelContainer/LabelTitle.text, watched, last_watched)
+	parent.update_watched(title, watched, last_watched)
 
 func update_watched_list(watched_eps, found_eps):
 	if typeof(watched_eps) == TYPE_ARRAY:

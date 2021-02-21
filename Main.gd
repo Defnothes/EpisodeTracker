@@ -14,6 +14,8 @@ var message_fade_counter = 0
 var message_fade_level = 0
 var message_color = Color(1,1,1,0)
 
+var lock_permaopen = false
+
 var files = []
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -60,12 +62,14 @@ func _ready():
 	#$VBoxContainer/EntriesHeader/LabelProgress.rect_min_size =\
 	#	cont_ent.get_child(1).rect_min_size
 	
+	lock_permaopen = config.get_value('visuals', 'lock_permaopen', false)
 	highlight_entries = config.get_value('visuals', 'highlight_entries', true)
 	
 	$ContainerHelp/LabelHelp.set_bbcode(Global.help_text)
 	
 	refresh()
 
+	unlock_downloads() if lock_permaopen else lock_downloads()
 	
 func print_info(message):
 	message_color = Color(1,1,1,1)
@@ -100,7 +104,6 @@ func refresh(reload_files = true):
 	if reload_files:
 		files = Global.list_files_in_directory(folder_path, search_recursive)
 	
-	var entry_lines = []
 	for entry in entry_list:
 		if not passes_filter(entry['title']):
 			continue
@@ -143,8 +146,7 @@ func refresh(reload_files = true):
 	#$VBoxContainer/ScrollContainer/ContainerEntryList.add_child(date_thing)
 	#var calendar_button_node = $CalendarButton
 	#calendar_button_node.connect("date_selected", self, "your_func_here")
-	for entry_line in entry_lines:
-		$VBoxContainer/ScrollContainer/ContainerEntryList.add_child(entry_line)
+
 	
 	sort_entries()
 	
@@ -245,6 +247,27 @@ func set_new_folder(path):
 	$VBoxContainer/PathContainer/Path.text = path
 	refresh()
 	
+func lock_downloads():
+	if not lock_permaopen:
+		$ButtonLockOff.visible = false
+		$ButtonLockOn.visible = true
+		
+		for entry_container in $VBoxContainer/ScrollContainer/ContainerEntryList.get_children():
+			for progress_button in entry_container.episodes:
+				if progress_button.current_status == Global.status.RELEASED:
+					#print(entry_container.title, progress_button.index)
+					progress_button.set_status(Global.status.LOCKED, progress_button.index)
+	
+func unlock_downloads():
+	$ButtonLockOn.visible = false
+	$ButtonLockOff.visible = true
+
+	for entry_container in $VBoxContainer/ScrollContainer/ContainerEntryList.get_children():
+		for progress_button in entry_container.episodes:
+			if progress_button.current_status == Global.status.LOCKED:
+				#print(entry_container.title, progress_button.index)
+				progress_button.set_status(Global.status.RELEASED, progress_button.index)
+	
 #%% Input handling
 func _unhandled_input(event):
 	
@@ -271,6 +294,10 @@ func _unhandled_input(event):
 						proc_char += 32
 					$VBoxContainer/HBoxContainerFilter/LineEditFilter.grab_focus()
 					$VBoxContainer/HBoxContainerFilter/LineEditFilter.append_at_cursor(char(proc_char))
+			elif Input.is_key_pressed(KEY_CONTROL) and Input.is_key_pressed(KEY_ALT):
+				unlock_downloads()
+		else:
+			lock_downloads()
 					
 				
 			
@@ -278,10 +305,13 @@ func _notification(what):
 	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
 		# For Windows
 		save_all()  
-	if what == MainLoop.NOTIFICATION_WM_GO_BACK_REQUEST: 
+	elif what == MainLoop.NOTIFICATION_WM_GO_BACK_REQUEST: 
 		# For android
 		save_all()
 		get_tree().quit()
+		
+	elif what == MainLoop.NOTIFICATION_WM_FOCUS_IN or what == MainLoop.NOTIFICATION_WM_FOCUS_OUT:
+		lock_downloads()
 
 func save_all():
 	config.set_value("scripts", 'watch', $VBoxContainer/ContainerWatchScript/LineEditWatchScript.text)
@@ -300,6 +330,7 @@ func save_all():
 	config.set_value('general', 'sort_dir', sort_dir)
 	config.set_value('general', 'search_recursive', search_recursive)
 	
+	config.set_value('visuals', 'lock_permaopen', lock_permaopen)
 	config.set_value('visuals', 'highlight_entries', highlight_entries)
 	
 	config.save("user://settings.cfg")
@@ -420,3 +451,13 @@ func _on_LineEdit_text_changed(_new_text):
 
 func _on_ButtonHelp_pressed():
 	$ContainerHelp.visible = !$ContainerHelp.visible
+
+
+func _on_ButtonLockOff_pressed():
+	lock_permaopen = false
+	lock_downloads()
+
+
+func _on_ButtonLockOn_pressed():
+	lock_permaopen = true
+	unlock_downloads()

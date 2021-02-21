@@ -73,7 +73,7 @@ func _on_Button_pressed():
 		Global.status.WATCHED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.WATCHING,index)
-				watched_parent.call(watched_callback, index, Global.status.WATCHING)
+				watched_parent.call(watched_callback, index, Global.status.WATCHING, false)
 			elif Input.is_key_pressed(KEY_ALT):
 				_clip_file()
 			else:
@@ -81,7 +81,7 @@ func _on_Button_pressed():
 		Global.status.WATCHING:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.DOWNLOADED,index)
-				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED)
+				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED, false)
 			else:
 				set_status(Global.status.WATCHED,index)
 				watched_parent.call(watched_callback, index, Global.status.WATCHED)
@@ -90,18 +90,23 @@ func _on_Button_pressed():
 				else:
 					_play_file()
 		Global.status.RELEASED:
-			if Input.is_key_pressed(KEY_CONTROL):
+			if Input.is_key_pressed(KEY_CONTROL) and not Input.is_key_pressed(KEY_ALT):
 				set_status(Global.status.DELETED, index)
-				watched_parent.call(watched_callback, index, Global.status.WATCHED)
-			elif dl_script!=null and not Input.is_key_pressed(KEY_ALT):
-				parent.print_info('Submitting API Req: ' + str(dl_params))
-				$HTTPRequest.request(dl_params)
+				watched_parent.call(watched_callback, index, Global.status.WATCHED, false)
+			elif dl_script!=null and \
+			not (Input.is_key_pressed(KEY_ALT) and not Input.is_key_pressed(KEY_CONTROL)):
+				if not parent.find_node('ButtonLockOn').visible:
+					parent.print_info('Submitting API Req: ' + str(dl_params))
+					$HTTPRequest.request(dl_params)
+				else:#The status should be LOCKED
+					parent.print_error("Disable Download Lock First")
 				#print(dl_script, dl_params)
 		Global.status.DELETED:
 			if Input.is_key_pressed(KEY_CONTROL):
 				set_status(Global.status.RELEASED,index)
-				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED)
-			
+				watched_parent.call(watched_callback, index, Global.status.DOWNLOADED, false)
+		Global.status.LOCKED:
+			parent.print_error("Disable Download Lock First")
 
 func call_magnet(_result, _response_code, _headers, body):
 	var magnet = Global.generate_magnet_from_RSS(body)

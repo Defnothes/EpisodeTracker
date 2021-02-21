@@ -11,7 +11,8 @@ enum status{
 	DOWNLOADED,
 	WATCHING,
 	WATCHED,
-	DELETED	
+	DELETED,
+	LOCKED	
 }
 
 var status2icon = {
@@ -21,7 +22,8 @@ var status2icon = {
 	status.DOWNLOADING:preload("res://res/download_in_progress.png"),
 	status.WATCHING:preload("res://res/Viewed_partial.png"),
 	status.WATCHED:preload("res://res/Viewed.png"),
-	status.DELETED:preload("res://res/Viewed_deleted.png")
+	status.DELETED:preload("res://res/Viewed_deleted.png"),
+	status.LOCKED:preload("res://res/download_locked.png")
 }
 
 var video_extensions = ['.mp4', '.mkv', '.avi', '.mp3', '.mob', '.flv', '.wmv',
@@ -213,6 +215,9 @@ func generate_magnet_from_RSS(body):
 
 var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 	[center]Press any key or click on [u]Help[/u] to close this window[/center]
+		Red Light:
+				While red shows cannot be downloaded (accidentally)
+				It can be toggled by clicking on it, or disabled by pressing ctrl-alt
 	
 		Header:
 				Enabling [u]Recursive[/u] next to the folder selector will enable searching sub-folders as well
@@ -233,9 +238,11 @@ var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 						[b]Green Arrow[/b]: Downloadable ― Click to fetch magnet link
 						[b]Green Arrow with red dots[/b]: Downloading ― unfinished download, download is probably in progress
 						[b]Eye[/b]: Ready ― Click to watch -> sets status to watched
+								Alt-Click to copy the path to the clipboard. Specially for Syncplay -> sets status as watched
 						[b]Ticked Eye[/b]: Watched ― Click to watch
 						[b]Eye with Blue Triangle[/b]: Half-Watched ― Click to watch → sets status to watched
 						[b]Grey Ticked Eye[/b]: Deleted ― watched, but file not found
+						[b]Lock over Arrow[/b]: Prevents accidental downloads. ctrl-alt or click the red light in the top left corner
 						[u]Ctrl-Click[/u]: toggles between statuses without performing any action (last watched timestamp is not updated either)
 								Downloadable ↔ Deleted
 								Ready → Watched → Half-Watched → Ready → ...
