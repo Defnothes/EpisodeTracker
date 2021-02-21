@@ -9,6 +9,7 @@ var sort_by = null
 var sort_dir = true
 var search_recursive = false
 var highlight_entries = false
+var autocomplete_enabled = true
 
 var message_fade_counter = 0
 var message_fade_level = 0
@@ -59,6 +60,7 @@ func _ready():
 	sort_dir = config.get_value('general', 'sort_dir', true)
 	search_recursive = config.get_value('general', 'search_recursive', false)
 	$VBoxContainer/PathContainer/ContainerPathInteract/CheckBoxRecursive.set_pressed(search_recursive)
+	autocomplete_enabled = config.get_value('general', 'autocomplete', true)
 	#$VBoxContainer/EntriesHeader/LabelProgress.rect_min_size =\
 	#	cont_ent.get_child(1).rect_min_size
 	
@@ -286,7 +288,11 @@ func _unhandled_input(event):
 				refresh()
 			elif event.scancode == KEY_H and Input.is_key_pressed(KEY_CONTROL):
 				highlight_entries = !highlight_entries
+				print_info('Highlighting %sabled' % ('en' if highlight_entries else 'dis'))
 				refresh(false)
+			elif event.scancode == KEY_T and Input.is_key_pressed(KEY_CONTROL):
+				autocomplete_enabled = !autocomplete_enabled
+				print_info('Autocomplete %sabled' % ('en' if autocomplete_enabled else 'dis'))
 			elif not Input.is_key_pressed(KEY_CONTROL) and\
 				(event.scancode>33 and event.scancode<126):
 					var proc_char = event.scancode
@@ -329,6 +335,7 @@ func save_all():
 	config.set_value('general', 'sort_by', sort_by)
 	config.set_value('general', 'sort_dir', sort_dir)
 	config.set_value('general', 'search_recursive', search_recursive)
+	config.set_value('general', 'autocomplete', autocomplete_enabled)
 	
 	config.set_value('visuals', 'lock_permaopen', lock_permaopen)
 	config.set_value('visuals', 'highlight_entries', highlight_entries)
@@ -366,14 +373,23 @@ func find_entry(title):
 			return entry
 	return null
 
+var old_text_title = ''
 func _on_TextEditTitle_text_changed(new_text):
 	var add_del = $VBoxContainer/ContainerActionButtons/ButtonAddEntry
 	if find_entry(new_text):
 		add_del.set_text('Delete')
 	else:
 		add_del.set_text('Add Title')
+	if autocomplete_enabled:
+		if old_text_title == '' and new_text != '':
+			var date_field = $VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate
+			if date_field.text == '':
+				date_field.text = Global.string_from_date_time(OS.get_datetime())
+			var epcount_field = $VBoxContainer/ContainerActionButtons/ContainerEpcount/TextEditEpcount
+			if epcount_field.text == '':
+				epcount_field.text = '12'
 	check_entry_is_valid()
-
+	old_text_title = new_text
 
 func check_entry_is_valid():
 	if (Global.unix_time_from_string($VBoxContainer/ContainerActionButtons/ContainerDateEdit/TextEditDate.text) != null and \

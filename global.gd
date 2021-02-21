@@ -222,7 +222,7 @@ var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 		Header:
 				Enabling [u]Recursive[/u] next to the folder selector will enable searching sub-folders as well
 				Press F5 to refresh/search the directories again
-	
+
 		Column Titles:
 				Click on [u]Next Ep[/u] or [u]Title[/u] to sort by those values respectively, clicking [u]Progress[/u] sorts by the date the show was last watched.
 				Clicking the column title again reverses the search
@@ -254,6 +254,8 @@ var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 						e.g. [b]20.12.30[/b] OR [b]20/12/30[/b] OR [b]2020.12.30[/b] OR [b]20.12.30.[/b] OR [b]20.12.30 22:30[/b] etc.
 				The anime will be searched for in the following form [<Subber>]<Title>+<episode>+<quality>. Subber and quality are optional. 
 				The first matching result is returned as the download link, any others are discarded.
+				If the Title field was empty, the date will be autocompleted to the current date and episode count will be filled with 12, 
+				provided they are empty and autocomplete is enabled (Ctrl-T to toggle)
 		
 		Watch and download details:
 				[u]Watch Script:[/u] The path to your video player's executable (e.g. C:/[...]/vlc.exe). The filename is given as an argument. Tested player: VLC
@@ -265,6 +267,9 @@ var help_text = """	[center][u][b]General Tips and Guide[/b][/u][/center]
 		[b]Hotkeys[/b]:
 			F5: to refresh/search the directories again
 			Ctrl-H: Enable/Disable highlighting of alterate rows
+			Ctrl-T: Enable/Disable Autocomplete
+			Cltr-Alt: Temprorarily disable download lock
+			Any alpha-numeric key: filter
 	[center]Press any key or click on [u]Help[/u] to close this window[/center]
 	
 	"""

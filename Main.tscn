@@ -349,7 +349,6 @@ script = ExtResource( 3 )
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
 [node name="ContainerHelp" type="PanelContainer" parent="."]
-visible = false
 self_modulate = Color( 0.784314, 1, 1, 0.941176 )
 margin_left = 37.0
 margin_top = 64.0
@@ -366,12 +365,6 @@ margin_right = 1136.0
 margin_bottom = 733.0
 custom_fonts/bold_font = ExtResource( 4 )
 bbcode_enabled = true
-
-[node name="PanelContainer" type="PanelContainer" parent="ContainerHelp"]
-margin_left = -3.0
-margin_top = -43.0
-margin_right = 87.0
-margin_bottom = 41.0
 
 [node name="ButtonLockOff" type="Button" parent="."]
 modulate = Color( 1, 1, 1, 0.764706 )
